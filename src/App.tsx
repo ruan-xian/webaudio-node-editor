@@ -1,26 +1,25 @@
 import React from 'react';
-import logo from './logo.svg';
+import { useRete } from 'rete-react-plugin';
 import './App.css';
+import './rete.css';
+import { initAudio, createEditor } from './rete';
+import { Button, Space } from "antd";
 
 function App() {
+  const [ref, editor]: readonly [any, any] = useRete(createEditor)
+
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+        <Space>
+          <Button onClick={initAudio}>Toggle Audio</Button>
+          <Button onClick={() => editor?.layout(true)}>Auto-arrange nodes</Button>
+        </Space>
+        <div ref={ref} className="rete">
+        </div>
       </header>
     </div>
   );
 }
 
-export default App;
+export default App
