@@ -31,12 +31,13 @@ import { useRef } from 'react';
 import { Select } from 'antd';
 import { DefaultOptionType } from 'antd/es/select';
 
-type Node = | MyConstantNode | AudioOutputNode | MyOscillatorNode | MyGainNode | VisualizerOutputNode;
+type Node = | MyConstantNode | AudioOutputNode | MyOscillatorNode | MyGainNode | TimeDomainVisualizerNode | FrequencyDomainVisualizerNode | MyNoiseNode;
 type Conn =
 | Connection<MyOscillatorNode, AudioOutputNode> 
 | Connection<MyOscillatorNode, MyOscillatorNode> 
 | Connection<MyConstantNode, MyOscillatorNode> 
-| Connection<MyGainNode, VisualizerOutputNode>
+| Connection<MyGainNode, TimeDomainVisualizerNode>
+| Connection<MyGainNode, FrequencyDomainVisualizerNode>
 | Connection<MyOscillatorNode, MyGainNode>
 type Schemes = GetSchemes<Node, Conn>;
 class Connection<A extends Node, B extends Node> extends Classic.Connection<
@@ -61,7 +62,7 @@ class DropdownControl extends Classic.InputControl<"text"> {
 }
 
 class VisualizerControl extends Classic.Control {
-  constructor(public analyserNode: AnalyserNode) {
+  constructor(public analyserNode: AnalyserNode, public isFrequencyDomain: boolean) {
     super()
   }
 }
@@ -70,11 +71,6 @@ function CustomVisualizerOutput(props: { data: VisualizerControl }) {
   const canvasRef = useRef() as React.MutableRefObject<HTMLCanvasElement>
 
   function draw() {
-    props.data.analyserNode.fftSize = 2048;
-    var bufferLength = props.data.analyserNode.frequencyBinCount;
-    var dataArray = new Uint8Array(bufferLength);
-    props.data.analyserNode.getByteTimeDomainData(dataArray);
-
     requestAnimationFrame(draw);
 
     if (canvasRef.current) {
@@ -83,33 +79,57 @@ function CustomVisualizerOutput(props: { data: VisualizerControl }) {
       var canvasCtx = canvas.getContext("2d");
 
       if (canvasCtx) {
-  
-        props.data.analyserNode.getByteTimeDomainData(dataArray);
-    
-        canvasCtx.fillStyle = "white";
-        canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
-    
-        canvasCtx.lineWidth = 2;
-        canvasCtx.strokeStyle = "rgb(0, 0, 0)";
-    
-        canvasCtx.beginPath();
-    
-        var sliceWidth = (canvas.width * 1.0) / bufferLength;
-        var x = 0;
-    
-        for (var i = 0; i < bufferLength; i++) {
-          var v = dataArray[i] / 128.0;
-          var y = (v * canvas.height) / 2;
-          if (i === 0) {
-            canvasCtx.moveTo(x, y);
-          } else {
-            canvasCtx.lineTo(x, y);
+
+        if (!props.data.isFrequencyDomain) {
+          props.data.analyserNode.fftSize = 2048;
+          var bufferLength = props.data.analyserNode.frequencyBinCount;
+          var dataArray = new Uint8Array(bufferLength);
+          props.data.analyserNode.getByteTimeDomainData(dataArray);
+      
+          canvasCtx.fillStyle = "white";
+          canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+      
+          canvasCtx.lineWidth = 2;
+          canvasCtx.strokeStyle = "rgb(0, 0, 0)";
+      
+          canvasCtx.beginPath();
+      
+          var sliceWidth = (canvas.width * 1.0) / bufferLength;
+          var x = 0;
+      
+          for (var i = 0; i < bufferLength; i++) {
+            var v = dataArray[i] / 128.0;
+            var y = (v * canvas.height) / 2;
+            if (i === 0) {
+              canvasCtx.moveTo(x, y);
+            } else {
+              canvasCtx.lineTo(x, y);
+            }
+            x += sliceWidth;
           }
-          x += sliceWidth;
+      
+          canvasCtx.lineTo(canvas.width, canvas.height / 2);
+          canvasCtx.stroke();
+        } else {
+          // based on code from https://www.telerik.com/blogs/adding-audio-visualization-react-app-using-web-audio-api
+          const bucketCt = props.data.analyserNode.frequencyBinCount / 8;
+          const fftData = new Uint8Array(bucketCt);
+          props.data.analyserNode.maxDecibels = -10;
+          props.data.analyserNode.getByteFrequencyData(fftData);
+          const bar_spacing = canvas.width / bucketCt;
+          const bar_width = bar_spacing;
+          const height_mult = canvas.height / 255 * 0.9;
+          let start = 0;
+
+          canvasCtx.fillStyle = "white";
+          canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+
+          for (let i = 0; i < fftData.length; i++) {
+            start = i * bar_spacing;
+            canvasCtx.fillStyle = "black";
+            canvasCtx.fillRect(start, canvasRef.current.height, bar_width, height_mult * -fftData[i]);
+          }
         }
-    
-        canvasCtx.lineTo(canvas.width, canvas.height / 2);
-        canvasCtx.stroke();
       }
     }
   }
@@ -131,7 +151,7 @@ function CustomDropdownControl(props: { data: DropdownControl }) {
 class MyOscillatorNode extends Classic.Node<{ baseFrequency: Classic.Socket, frequency: Classic.Socket }, { signal: Classic.Socket }, { waveform: DropdownControl }> {
   width = 180
   height = 200
-  constructor(change?: () => void, private update?: (control: LabeledInputControl) => void) {
+  constructor(change?: () => void) {
     super('Oscillator');
 
     let baseFreqInput = new Classic.Input(socket, "Base Frequency", false);
@@ -177,10 +197,52 @@ class MyOscillatorNode extends Classic.Node<{ baseFrequency: Classic.Socket, fre
   }
 }
 
+type NoiseType = "White Noise" | "Brown Noise"
+
+class MyNoiseNode extends Classic.Node<{}, { signal: Classic.Socket }, {}> {
+  width = 180
+  height = 80
+  constructor(public noiseType: NoiseType) {
+    super(noiseType);
+    this.addOutput("signal", new Classic.Output(socket, "Signal"))
+  }
+
+  data(): { signal: AudioNode } {
+    const noiseSource = audioCtx.createBufferSource();
+    var bufferSize = 10 * audioCtx.sampleRate;
+    var noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+    var output = noiseBuffer.getChannelData(0);
+
+    if (this.noiseType === "White Noise") {
+      for (let i = 0; i < bufferSize; i++) {
+        output[i] = Math.random() * 2 - 1;
+      }
+    } else if (this.noiseType === "Brown Noise") {
+      var lastOut = 0;
+      for (let i = 0; i < bufferSize; i++) {
+        var brown = Math.random() * 2 - 1;
+      
+        output[i] = (lastOut + (0.02 * brown)) / 1.02;
+        lastOut = output[i];
+        output[i] *= 3.5;
+      }
+    }
+    noiseSource.buffer = noiseBuffer;
+    noiseSource.loop = true;
+
+    audioSources.push(noiseSource);
+    audioSourceStates.push(false);
+
+    return {
+      signal: noiseSource
+    }
+  }
+}
+
 class MyGainNode extends Classic.Node<{ signal: Classic.Socket, baseGain: Classic.Socket, additionalGain: Classic.Socket }, { signal: Classic.Socket }, {}> {
   width = 180
   height = 200
-  constructor(initial?: number, change?: () => void, private update?: (control: LabeledInputControl) => void) {
+  constructor(initial?: number, change?: () => void) {
     super('Gain');
 
 
@@ -248,17 +310,41 @@ class AudioOutputNode extends Classic.Node<{ signal: Classic.Socket }, {}, { gai
   }
 }
 
-class VisualizerOutputNode extends Classic.Node<{ signal: Classic.Socket }, {}, { visualizer: VisualizerControl }> {
+class TimeDomainVisualizerNode extends Classic.Node<{ signal: Classic.Socket }, {}, { visualizer: VisualizerControl }> {
   width = 400
   height = 200
   public analyserNode = audioCtx.createAnalyser()
   constructor() {
-    super('Signal Visualizer')
+    super('Time Domain Visualizer')
 
     this.addInput('signal', new Classic.Input(socket, 'Signal', true));
     this.addControl(
       'visualizer',
-      new VisualizerControl(this.analyserNode)
+      new VisualizerControl(this.analyserNode, false)
+    );
+  }
+
+  data(inputs: { signal?: AudioNode[] }): { value: AnalyserNode } {
+    if (inputs.signal) {
+      inputs.signal.forEach(itm => itm.connect(this.analyserNode));
+    }
+    return {
+      value: this.analyserNode
+    }
+  }
+}
+
+class FrequencyDomainVisualizerNode extends Classic.Node<{ signal: Classic.Socket }, {}, { visualizer: VisualizerControl }> {
+  width = 400
+  height = 200
+  public analyserNode = audioCtx.createAnalyser()
+  constructor() {
+    super('Frequency Domain Visualizer')
+
+    this.addInput('signal', new Classic.Input(socket, 'Signal', true));
+    this.addControl(
+      'visualizer',
+      new VisualizerControl(this.analyserNode, true)
     );
   }
 
@@ -379,9 +465,13 @@ export async function createEditor(container: HTMLElement) {
       ["Constant", () => new MyConstantNode(1, process)],
       ["Oscillator", () => new MyOscillatorNode(process)],
       ["Gain", () => new MyGainNode(1, process)],
+      ["Noise", 
+      [["Brown Noise", () => new MyNoiseNode("Brown Noise")],
+      ["White Noise", () => new MyNoiseNode("White Noise")]]],
       ["Outputs", 
       [["AudioOutput", () => new AudioOutputNode(process)],
-      ["Visualizer", () => new VisualizerOutputNode()]]]
+      ["Time Domain Visualizer", () => new TimeDomainVisualizerNode()],
+      ["Frequency Domain Visualizer", () => new FrequencyDomainVisualizerNode()]]]
     ])
   });
 
@@ -427,16 +517,18 @@ export async function createEditor(container: HTMLElement) {
       }
     }
   }));
-  reactRender.addPreset(Presets.contextMenu.setup());
+  reactRender.addPreset(Presets.contextMenu.setup({ delay: 200 }));
 
   const osc = new MyOscillatorNode(process);
   const gain = new MyGainNode(0.5, process);
-  const visualizer = new VisualizerOutputNode();
+  const visualizer = new TimeDomainVisualizerNode();
+  const freqVisualizer = new FrequencyDomainVisualizerNode();
   const output = new AudioOutputNode(process);
 
   await editor.addNode(osc);
   await editor.addNode(gain);
   await editor.addNode(visualizer);
+  await editor.addNode(freqVisualizer);
   await editor.addNode(output);
 
   var c = new Connection(osc, 'signal', gain, 'signal')
@@ -444,6 +536,7 @@ export async function createEditor(container: HTMLElement) {
   await editor.addConnection(c);
   await editor.addConnection(new Connection(gain, 'signal', visualizer, 'signal'));
   await editor.addConnection(new Connection(gain, 'signal', output, 'signal'));
+  await editor.addConnection(new Connection(gain, 'signal', freqVisualizer, 'signal'));
 
   await arrange.layout({ applier });
   AreaExtensions.zoomAt(area, editor.getNodes());
