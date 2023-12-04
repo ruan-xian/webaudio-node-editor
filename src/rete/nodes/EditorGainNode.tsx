@@ -34,7 +34,7 @@ export class EditorGainNode extends Classic.Node<{ signal: Classic.Socket, baseG
       gainNode.gain.setValueAtTime(0, audioCtx.currentTime)
       inputs.baseGain[0].connect(gainNode.gain)
     } else {
-      gainNode.gain.setValueAtTime((gainControl as LabeledInputControl).value || 1, audioCtx.currentTime);
+      gainNode.gain.setValueAtTime((gainControl as LabeledInputControl).value || 0, audioCtx.currentTime);
     }
 
     if (inputs.additionalGain) {
