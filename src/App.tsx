@@ -12,6 +12,9 @@ function App() {
     <div className="App">
       <header className="App-header">
         <Space>
+          <Button onClick={() => editor?.importEditorFromFile()}>Import</Button>
+          <Button onClick={() => editor?.exportEditorToFile()}>Export</Button>
+          <Button onClick={() => editor?.clearEditor()}>Clear</Button>
           <Button onClick={initAudio}>Toggle Audio</Button>
           <Button onClick={() => editor?.layout(true)}>Auto-arrange nodes</Button>
         </Space>

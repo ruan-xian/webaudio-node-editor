@@ -1,6 +1,6 @@
 import { ClassicPreset as Classic, GetSchemes, NodeEditor } from 'rete';
 
-import { Area2D, AreaPlugin, AreaExtensions, Zoom } from 'rete-area-plugin';
+import { Area2D, AreaPlugin, AreaExtensions } from 'rete-area-plugin';
 import {
   ConnectionPlugin,
   Presets as ConnectionPresets,
@@ -26,8 +26,6 @@ import { DataflowEngine } from 'rete-engine'; import {
   Presets as ContextMenuPresets
 } from "rete-context-menu-plugin";
 
-import anime from "animejs/lib/anime.es.js";
-
 import { DropdownControl, CustomDropdownControl } from './controls/DropdownControl';
 import { LabeledInputControl, CustomLabeledInputControl } from './controls/LabeledInputControl';
 import { VisualizerControl, CustomVisualizerOutput } from './controls/VisualizerControl';
@@ -41,6 +39,10 @@ import { EditorBiquadNode } from './nodes/EditorBiquadNode';
 import { ClipNode } from './nodes/ClipNode';
 
 import { ModifierNodeStyle, OutputNodeStyle, SourceNodeStyle } from './nodestyles';
+import { SmoothZoom } from './smoothzoom';
+
+import { importEditor, exportEditor } from './imports';
+import { clearEditor } from './utils';
 
 type SourceNode =
   | EditorConstantNode
@@ -68,8 +70,10 @@ type Node =
   | SourceNode
   | ModifierNode
   | OutputNode;
+
 type Conn = Connection<Node, Node>
 export type Schemes = GetSchemes<Node, Conn>;
+
 export class Connection<A extends Node, B extends Node> extends Classic.Connection<
   A,
   B
@@ -138,86 +142,6 @@ function process() {
   setTimeout(reInitOscillators, 100);
 }
 
-class SmoothZoom extends Zoom {
-  animation?: any;
-
-  screenToArea(x: number, y: number, t: any) {
-    const { x: tx, y: ty, k } = t;
-
-    return { x: (x - tx) / k, y: (y - ty) / k };
-  }
-
-  areaToScreen(x: number, y: number, t: any) {
-    const { x: tx, y: ty, k } = t;
-
-    return { x: x * k + tx, y: y * k + ty };
-  }
-
-  constructor(
-    intensity: number,
-    private duration: number,
-    private easing: string,
-    private area: AreaPlugin<any, any>
-  ) {
-    super(intensity);
-  }
-
-  wheel = (e: WheelEvent) => {
-    e.preventDefault();
-
-    const isNegative = e.deltaY < 0;
-    const delta = isNegative ? this.intensity : -this.intensity * 0.75;
-    const { left, top } = this.container.getBoundingClientRect();
-    const ox = e.clientX - left;
-    const oy = e.clientY - top;
-
-    const coords = this.screenToArea(ox, oy, this.area.area.transform);
-
-    const { k } = this.area.area.transform;
-    const targets = {
-      zoom: k
-    };
-    const { duration, easing } = this;
-
-    if (this.animation) {
-      this.animation.reset();
-    }
-    this.animation = anime({
-      targets,
-      x: coords.x,
-      y: coords.y,
-      zoom: k * (1 + delta),
-      duration,
-      easing,
-      update: () => {
-        const currentTransform = this.area.area.transform;
-
-        const coordinates = this.areaToScreen(coords.x, coords.y, currentTransform);
-
-        const nextX = coordinates.x - coords.x * targets.zoom;
-        const nextY = coordinates.y - coords.y * targets.zoom;
-
-        this.area.area.zoom(
-          targets.zoom,
-          nextX - currentTransform.x,
-          nextY - currentTransform.y
-        );
-      }
-    });
-  };
-
-  dblclick = (e: MouseEvent) => {
-    return;
-  }
-
-  destroy() {
-    super.destroy();
-    if (this.animation) {
-      this.animation.reset();
-    }
-  }
-}
-
 export async function createEditor(container: HTMLElement) {
 
   const area = new AreaPlugin<Schemes, AreaExtra>(container);
@@ -241,7 +165,7 @@ export async function createEditor(container: HTMLElement) {
       ["Gain", () => new EditorGainNode(process)],
       ["Biquad Filter", () => new EditorBiquadNode(process)],
       ["Clip", () => new ClipNode(process)],
-      ["Noise", () => new EditorNoiseNode(process, {noiseType: "White Noise"})],
+      ["Noise", () => new EditorNoiseNode(process, { noiseType: "White Noise" })],
       ["Outputs",
         [["Universal Output", () => new UniversalOutputNode(process)],
         ["Audio Output", () => new AudioOutputNode(process)],
@@ -312,30 +236,97 @@ export async function createEditor(container: HTMLElement) {
   reactRender.addPreset(Presets.contextMenu.setup({ delay: 200 }));
 
   const osc = new EditorOscillatorNode(process);
-  const gain = new EditorGainNode(process, {gain: 0.5});
+  const gain = new EditorGainNode(process, { gain: 0.5 });
   const output = new UniversalOutputNode(process);
 
   await editor.addNode(osc);
   await editor.addNode(gain);
   await editor.addNode(output);
 
-  var c = new Connection<Node,Node>(osc, 'signal' as never, gain, 'signal' as never)
+  var c = new Connection<Node, Node>(osc, 'signal' as never, gain, 'signal' as never)
 
   await editor.addConnection(c);
-  await editor.addConnection(new Connection<Node,Node>(gain, 'signal' as never, output, 'signal' as never));
+  await editor.addConnection(new Connection<Node, Node>(gain, 'signal' as never, output, 'signal' as never));
 
   await arrange.layout({ applier });
   AreaExtensions.zoomAt(area, editor.getNodes());
 
   await editor.removeConnection(c.id);
 
-  process()
+  process();
+
+  const context: Context = {
+    process: process,
+    editor: editor,
+    area: area,
+    dataflow: engine,
+  };
+
+  async function loadEditor(data: any) {
+    await clearEditor(editor);
+    await importEditor(context, data);
+    await arrange.layout({ applier: undefined });
+    AreaExtensions.zoomAt(area, editor.getNodes());
+  }
+  async function saveEditor() {
+    var data = exportEditor(context);
+    await arrange.layout({ applier: undefined });
+    AreaExtensions.zoomAt(area, editor.getNodes());
+    return data;
+  }
+  const fileOptions = {
+    types: [
+      {
+        description: 'JSON files',
+        accept: {
+          "text/plain": ".json" as `.${string}`,
+        },
+      },
+    ],
+  };
+  async function importEditorFromFile() {
+    var fileHandle;
+    try {
+      [fileHandle] = await window.showOpenFilePicker(fileOptions);
+    } catch (e) {
+      return;
+    }
+    const file = await fileHandle.getFile();
+    const contents = await file.text();
+    await loadEditor(JSON.parse(contents))
+  }
+  async function exportEditorToFile() {
+    var data = await saveEditor();
+    async function getNewFileHandle() {
+      const handle = await window.showSaveFilePicker(fileOptions);
+      return handle;
+    }
+    
+    async function writeFile(fileHandle: any, contents: any) {
+      // Create a FileSystemWritableFileStream to write to.
+      const writable = await fileHandle.createWritable();
+      // Write the contents of the file to the stream.
+      await writable.write(contents);
+      // Close the file and write the contents to disk.
+      await writable.close();
+    }
+
+    try {
+      var hdl = await getNewFileHandle();
+    } catch (e) {
+      return;
+    }
+    writeFile(hdl, JSON.stringify(data));
+  }
 
   return {
     layout: async (animate: boolean) => {
       await arrange.layout({ applier: animate ? applier : undefined });
       AreaExtensions.zoomAt(area, editor.getNodes());
     },
+    exportEditorToFile,
+    importEditorFromFile,
+    clearEditor: () => clearEditor(editor),
     destroy: () => area.destroy(),
   };
 }

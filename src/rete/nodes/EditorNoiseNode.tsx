@@ -48,7 +48,7 @@ export class EditorNoiseNode extends Classic.Node<{}, { signal: Classic.Socket }
 
   serialize() {
     return {
-      noiseType: this.controls.noiseType.value
+      noiseType: this.controls.noiseType.value as string
     }
   }
 }

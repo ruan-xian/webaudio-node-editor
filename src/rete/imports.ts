@@ -6,8 +6,7 @@ import { AudioOutputNode, UniversalOutputNode } from './nodes/AudioOutputNode';
 import { EditorConstantNode } from './nodes/EditorConstantNode';
 import { TimeDomainVisualizerNode, FrequencyDomainVisualizerNode } from './nodes/VisualizerNodes';
 import { EditorBiquadNode } from './nodes/EditorBiquadNode';
-import { ClipNode } from './nodes/ClipNode';																																											
-import { removeConnections } from "./utils";
+import { ClipNode } from './nodes/ClipNode';
 
 export async function createNode(
   { editor, area, dataflow, process }: Context,
@@ -31,6 +30,10 @@ export async function createNode(
 			return new EditorNoiseNode(process, data);
 		case "Oscillator":
 			return new EditorOscillatorNode(process, data);
+    case "Time Domain Visualizer":
+      return new TimeDomainVisualizerNode();
+    case "Frequency Domain Visualizer":
+      return new FrequencyDomainVisualizerNode();
 		default:
 			throw new Error("Unsupported node");
 	}
