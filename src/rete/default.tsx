@@ -1,6 +1,6 @@
 import { ClassicPreset as Classic, GetSchemes, NodeEditor } from 'rete';
 
-import { Area2D, AreaPlugin, AreaExtensions } from 'rete-area-plugin';
+import { Area2D, AreaPlugin, AreaExtensions, Zoom } from 'rete-area-plugin';
 import {
   ConnectionPlugin,
   Presets as ConnectionPresets,
@@ -36,8 +36,9 @@ import { EditorGainNode } from './nodes/EditorGainNode';
 import { AudioOutputNode } from './nodes/AudioOutputNode';
 import { EditorConstantNode } from './nodes/EditorConstantNode';
 import { TimeDomainVisualizerNode, FrequencyDomainVisualizerNode } from './nodes/VisualizerNodes';
+import { EditorBiquadNode } from './nodes/EditorBiquadNode';
 
-type Node = | EditorConstantNode | AudioOutputNode | EditorOscillatorNode | EditorGainNode | TimeDomainVisualizerNode | FrequencyDomainVisualizerNode | EditorNoiseNode;
+type Node = | EditorConstantNode | AudioOutputNode | EditorOscillatorNode | EditorGainNode | TimeDomainVisualizerNode | FrequencyDomainVisualizerNode | EditorNoiseNode | EditorBiquadNode;
 type Conn = Connection<Node,Node>
 | Connection<EditorGainNode, AudioOutputNode> 
 | Connection<EditorGainNode, TimeDomainVisualizerNode>
@@ -106,9 +107,16 @@ function process() {
   setTimeout(reInitOscillators, 100);
 }
 
+class NoDblClickZoom extends Zoom {
+  dblclick = (e: MouseEvent) => {
+    return;
+  }
+}
+
 export async function createEditor(container: HTMLElement) {
 
   const area = new AreaPlugin<Schemes, AreaExtra>(container);
+  area.area.setZoomHandler(new NoDblClickZoom(0.5));
   const connection = new ConnectionPlugin<Schemes, AreaExtra>();
   const reactRender = new ReactPlugin<Schemes, AreaExtra>({ createRoot });
   const arrange = new AutoArrangePlugin<Schemes>();
@@ -127,6 +135,7 @@ export async function createEditor(container: HTMLElement) {
       ["Constant", () => new EditorConstantNode(1, process)],
       ["Oscillator", () => new EditorOscillatorNode(process)],
       ["Gain", () => new EditorGainNode(1, process)],
+      ["Biquad Filter", () => new EditorBiquadNode(process)],
       ["Noise", 
       [["Brown Noise", () => new EditorNoiseNode("Brown Noise")],
       ["White Noise", () => new EditorNoiseNode("White Noise")]]],
