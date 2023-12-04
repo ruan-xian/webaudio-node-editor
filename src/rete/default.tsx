@@ -40,7 +40,7 @@ import { TimeDomainVisualizerNode, FrequencyDomainVisualizerNode } from './nodes
 import { EditorBiquadNode } from './nodes/EditorBiquadNode';
 import { ClipNode } from './nodes/ClipNode';
 
-import { OutputNodeStyle, SourceNodeStyle } from './nodestyles';
+import { ModifierNodeStyle, OutputNodeStyle, SourceNodeStyle } from './nodestyles';
 
 type SourceNode =
   | EditorConstantNode
@@ -295,6 +295,9 @@ export async function createEditor(container: HTMLElement) {
         }
         if (sourceNodeTypes.some((c) => context.payload instanceof c)) {
           return SourceNodeStyle;
+        }
+        if (modifierNodeTypes.some((c) => context.payload instanceof c)) {
+          return ModifierNodeStyle;
         }
         if (context.payload instanceof Classic.Node) {
           return Presets.classic.Node;

@@ -6,6 +6,10 @@ const OutputStyle = css<{ selected?: boolean }>`
 `;
 
 const SourceStyle = css<{ selected?: boolean }>`
+  background: #77beed;
+`;
+
+const ModifierStyle = css<{ selected?: boolean }>`
   background: #4cad5a;
 `;
 
@@ -14,4 +18,7 @@ export function OutputNodeStyle(props: any) {
 }
 export function SourceNodeStyle(props: any) {
   return <Presets.classic.Node styles={() => SourceStyle} {...props} />;
+}
+export function ModifierNodeStyle(props: any) {
+  return <Presets.classic.Node styles={() => ModifierStyle} {...props} />;
 }
