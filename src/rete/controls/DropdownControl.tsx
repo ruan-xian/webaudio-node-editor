@@ -3,8 +3,10 @@ import {Select} from "antd"
 import { DefaultOptionType } from 'antd/es/select';
 
 export class DropdownControl extends Classic.InputControl<"text"> {
-  constructor(public menuOptions: DefaultOptionType[], public label?: string, change?: () => void) {
-    super("text", { initial: menuOptions[0]?.value?.toString() || "default", change })
+  constructor(change: () => void, public menuOptions: DefaultOptionType[], initial?: string, public label?: string, ) {
+    super("text", { 
+      initial: initial ? initial : menuOptions[0]?.value?.toString() || "default", 
+      change })
   }
 }
 

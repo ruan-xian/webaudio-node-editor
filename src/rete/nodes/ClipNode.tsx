@@ -2,17 +2,17 @@ import { ClassicPreset as Classic } from "rete"
 import { socket, audioCtx } from "../default"
 import { LabeledInputControl } from "../controls/LabeledInputControl"
 
-export class ClipNode extends Classic.Node<{ signal: Classic.Socket }, { signal: Classic.Socket }, {amp: LabeledInputControl}> {
+export class ClipNode extends Classic.Node<{ signal: Classic.Socket }, { signal: Classic.Socket }, { amp: LabeledInputControl }> {
 	width = 180
 	height = 170
-	constructor(change?: () => void) {
+	constructor(change: () => void, initial?: { amp: number }) {
 		super('Clip Signal');
 
 
 		let signalInput = new Classic.Input(socket, 'Signal', true);
 		this.addInput("signal", signalInput);
 
-		this.addControl("amp", new LabeledInputControl(1, "Amplitude cutoff", change));
+		this.addControl("amp", new LabeledInputControl(initial ? initial.amp : 1, "Amplitude cutoff", change));
 
 		this.addOutput("signal", new Classic.Output(socket, "Signal"))
 	}
@@ -34,6 +34,12 @@ export class ClipNode extends Classic.Node<{ signal: Classic.Socket }, { signal:
 
 		return {
 			signal: waveShaper
+		}
+	}
+
+	serialize() {
+		return {
+			amp: this.controls.amp.value
 		}
 	}
 }

@@ -6,22 +6,22 @@ import { DropdownControl } from "../controls/DropdownControl"
 export class EditorBiquadNode extends Classic.Node<{ signal: Classic.Socket, frequency: Classic.Socket, q: Classic.Socket, gain: Classic.Socket }, { signal: Classic.Socket }, { filterType: DropdownControl }> {
 	width = 180
 	height = 300
-	constructor(change?: () => void) {
+	constructor(change: () => void, initial?: {freq: number, q: number, gain: number, filterType: string}) {
 		super('Biquad Filter');
 
 		let signalInput = new Classic.Input(socket, 'Signal', true);
 		this.addInput("signal", signalInput);
 
 		let freqInput = new Classic.Input(socket, "Filter frequency", true);
-		freqInput.addControl(new LabeledInputControl(350, "Filter frequency", change))
+		freqInput.addControl(new LabeledInputControl(initial ? initial.freq : 350, "Filter frequency", change))
 		this.addInput("frequency", freqInput);
 
 		let qInput = new Classic.Input(socket, "Q", true);
-		qInput.addControl(new LabeledInputControl(1, "Q", change))
+		qInput.addControl(new LabeledInputControl(initial ? initial.q : 1, "Q", change))
 		this.addInput("q", qInput);
 
 		let gainInput = new Classic.Input(socket, "Filter gain", true);
-		gainInput.addControl(new LabeledInputControl(0, "Filter gain", change))
+		gainInput.addControl(new LabeledInputControl(initial ? initial.gain : 0, "Filter gain", change))
 		this.addInput("gain", gainInput);
 
 		this.addOutput("signal", new Classic.Output(socket, "Signal"))
@@ -37,7 +37,7 @@ export class EditorBiquadNode extends Classic.Node<{ signal: Classic.Socket, fre
 			{ value: "allpass", label: "allpass" },
 		]
 
-		this.addControl("filterType", new DropdownControl(dropdownOptions, undefined, change))
+		this.addControl("filterType", new DropdownControl(change, dropdownOptions, initial ? initial.filterType : undefined))
 	}
 
 	data(inputs: { signal?: AudioNode[], frequency?: AudioNode[], q?: AudioNode[], gain?: AudioNode[] }): { signal: AudioNode } {
@@ -76,6 +76,15 @@ export class EditorBiquadNode extends Classic.Node<{ signal: Classic.Socket, fre
 
 		return {
 			signal: bqNode
+		}
+	}
+
+	serialize() {
+		return {
+			freq: (this.inputs.frequency?.control as LabeledInputControl).value,
+			q: (this.inputs.q?.control as LabeledInputControl).value,
+			gain: (this.inputs.gain?.control as LabeledInputControl).value,
+			filterTpye: this.controls.filterType.value
 		}
 	}
 }

@@ -14,11 +14,14 @@ const ModifierStyle = css<{ selected?: boolean }>`
 `;
 
 export function OutputNodeStyle(props: any) {
+// eslint-disable-next-line
   return <Presets.classic.Node styles={() => OutputStyle} {...props} />;
 }
 export function SourceNodeStyle(props: any) {
+// eslint-disable-next-line
   return <Presets.classic.Node styles={() => SourceStyle} {...props} />;
 }
 export function ModifierNodeStyle(props: any) {
+// eslint-disable-next-line
   return <Presets.classic.Node styles={() => ModifierStyle} {...props} />;
 }

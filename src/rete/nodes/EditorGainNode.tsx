@@ -5,7 +5,7 @@ import { LabeledInputControl } from "../controls/LabeledInputControl"
 export class EditorGainNode extends Classic.Node<{ signal: Classic.Socket, baseGain: Classic.Socket, additionalGain: Classic.Socket }, { signal: Classic.Socket }, {}> {
   width = 180
   height = 200
-  constructor(initial?: number, change?: () => void) {
+  constructor(change: () => void, initial?: { gain: number }) {
     super('Gain');
 
 
@@ -13,7 +13,7 @@ export class EditorGainNode extends Classic.Node<{ signal: Classic.Socket, baseG
     this.addInput("signal", signalInput);
 
     let baseGainInput = new Classic.Input(socket, "Base Gain", false);
-    baseGainInput.addControl(new LabeledInputControl(initial || 1, "Base Gain", change))
+    baseGainInput.addControl(new LabeledInputControl(initial ? initial.gain : 1, "Base Gain", change))
     this.addInput("baseGain", baseGainInput);
 
     let gainInput = new Classic.Input(socket, "Additional Gain", true);
@@ -43,6 +43,12 @@ export class EditorGainNode extends Classic.Node<{ signal: Classic.Socket, baseG
 
     return {
       signal: gainNode
+    }
+  }
+
+  serialize() {
+    return {
+      gain: (this.inputs.baseGain?.control as LabeledInputControl).value
     }
   }
 }

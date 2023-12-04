@@ -69,13 +69,18 @@ type Node =
   | ModifierNode
   | OutputNode;
 type Conn = Connection<Node, Node>
-  | Connection<EditorGainNode, UniversalOutputNode>
-  | Connection<EditorOscillatorNode, EditorGainNode>
 export type Schemes = GetSchemes<Node, Conn>;
-class Connection<A extends Node, B extends Node> extends Classic.Connection<
+export class Connection<A extends Node, B extends Node> extends Classic.Connection<
   A,
   B
 > { }
+
+export type Context = {
+  process: () => void;
+  editor: NodeEditor<Schemes>;
+  area: AreaPlugin<Schemes, any>;
+  dataflow: DataflowEngine<Schemes>;
+};
 
 type AreaExtra = Area2D<Schemes> | ReactArea2D<Schemes> | ContextMenuExtra;
 
@@ -231,14 +236,12 @@ export async function createEditor(container: HTMLElement) {
 
   const contextMenu = new ContextMenuPlugin<Schemes>({
     items: ContextMenuPresets.classic.setup([
-      ["Constant", () => new EditorConstantNode(1, process)],
+      ["Constant", () => new EditorConstantNode(process)],
       ["Oscillator", () => new EditorOscillatorNode(process)],
-      ["Gain", () => new EditorGainNode(1, process)],
+      ["Gain", () => new EditorGainNode(process)],
       ["Biquad Filter", () => new EditorBiquadNode(process)],
       ["Clip", () => new ClipNode(process)],
-      ["Noise",
-        [["Brown Noise", () => new EditorNoiseNode("Brown Noise")],
-        ["White Noise", () => new EditorNoiseNode("White Noise")]]],
+      ["Noise", () => new EditorNoiseNode(process, {noiseType: "White Noise"})],
       ["Outputs",
         [["Universal Output", () => new UniversalOutputNode(process)],
         ["Audio Output", () => new AudioOutputNode(process)],
@@ -309,17 +312,17 @@ export async function createEditor(container: HTMLElement) {
   reactRender.addPreset(Presets.contextMenu.setup({ delay: 200 }));
 
   const osc = new EditorOscillatorNode(process);
-  const gain = new EditorGainNode(0.5, process);
+  const gain = new EditorGainNode(process, {gain: 0.5});
   const output = new UniversalOutputNode(process);
 
   await editor.addNode(osc);
   await editor.addNode(gain);
   await editor.addNode(output);
 
-  var c = new Connection(osc, 'signal', gain, 'signal')
+  var c = new Connection<Node,Node>(osc, 'signal' as never, gain, 'signal' as never)
 
   await editor.addConnection(c);
-  await editor.addConnection(new Connection(gain, 'signal', output, 'signal'));
+  await editor.addConnection(new Connection<Node,Node>(gain, 'signal' as never, output, 'signal' as never));
 
   await arrange.layout({ applier });
   AreaExtensions.zoomAt(area, editor.getNodes());

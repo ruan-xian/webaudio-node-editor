@@ -6,11 +6,11 @@ import { DropdownControl } from "../controls/DropdownControl"
 export class EditorOscillatorNode extends Classic.Node<{ baseFrequency: Classic.Socket, frequency: Classic.Socket }, { signal: Classic.Socket }, { waveform: DropdownControl }> {
 	width = 180
 	height = 200
-	constructor(change?: () => void) {
+	constructor(change: () => void, initial?: { baseFreq: number, waveform: string }) {
 		super('Oscillator');
 
 		let baseFreqInput = new Classic.Input(socket, "Base Frequency", false);
-		baseFreqInput.addControl(new LabeledInputControl(440, "Base Frequency", change))
+		baseFreqInput.addControl(new LabeledInputControl(initial ? initial.baseFreq : 440, "Base Frequency", change))
 		this.addInput("baseFrequency", baseFreqInput);
 
 		let freqInput = new Classic.Input(socket, 'Additional Frequency', true);
@@ -25,7 +25,7 @@ export class EditorOscillatorNode extends Classic.Node<{ baseFrequency: Classic.
 			{ value: "square", label: "square" },
 		]
 
-		this.addControl("waveform", new DropdownControl(dropdownOptions, undefined, change))
+		this.addControl("waveform", new DropdownControl(change, dropdownOptions, initial ? initial.waveform : undefined))
 	}
 
 	data(inputs: { baseFrequency?: AudioNode[], frequency?: AudioNode[] }): { signal: AudioNode } {
@@ -48,6 +48,13 @@ export class EditorOscillatorNode extends Classic.Node<{ baseFrequency: Classic.
 		audioSourceStates.push(false);
 		return {
 			signal: osc
+		}
+	}
+
+	serialize() {
+		return {
+			baseFreq: (this.inputs.baseFrequency?.control as LabeledInputControl).value,
+			waveform: this.controls.waveform.value
 		}
 	}
 }

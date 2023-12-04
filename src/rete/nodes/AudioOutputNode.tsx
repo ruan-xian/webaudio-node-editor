@@ -6,7 +6,7 @@ import { VisualizerControl } from "../controls/VisualizerControl"
 export class AudioOutputNode extends Classic.Node<{ signal: Classic.Socket }, {}, {}> {
   width = 180
   height = 140
-  constructor(change?: () => void) {
+  constructor(change: () => void) {
     super('Audio Output');
 
     this.addInput('signal', new Classic.Input(socket, 'Signal', true));
@@ -23,31 +23,35 @@ export class AudioOutputNode extends Classic.Node<{ signal: Classic.Socket }, {}
       value: val
     }
   }
+
+  serialize() {
+    return {};
+  }
 }
 
 export class UniversalOutputNode extends Classic.Node<{ signal: Classic.Socket }, {}, { gain: LabeledInputControl, timeVisualizer: VisualizerControl, freqVisualizer: VisualizerControl }> {
   width = 400
   height = 370
-	public timeAnalyserNode = audioCtx.createAnalyser()
-	public freqAnalyserNode = audioCtx.createAnalyser()
+  public timeAnalyserNode = audioCtx.createAnalyser()
+  public freqAnalyserNode = audioCtx.createAnalyser()
 
-  constructor(change?: () => void) {
+  constructor(change: () => void, initial?: { gain: number }) {
     super('Universal Output');
 
     this.addInput('signal', new Classic.Input(socket, 'Signal', true));
     this.addControl(
       'gain',
-      new LabeledInputControl(1, "Gain", change)
+      new LabeledInputControl(initial ? initial.gain : 1, "Gain", change)
     );
 
-		this.addControl(
-			'timeVisualizer',
-			new VisualizerControl(this.timeAnalyserNode, false)
-		);
-		this.addControl(
-			'freqVisualizer',
-			new VisualizerControl(this.freqAnalyserNode, true)
-		);
+    this.addControl(
+      'timeVisualizer',
+      new VisualizerControl(this.timeAnalyserNode, false)
+    );
+    this.addControl(
+      'freqVisualizer',
+      new VisualizerControl(this.freqAnalyserNode, true)
+    );
   }
 
   data(inputs: { signal?: AudioNode[] }): { value: boolean } {
@@ -66,6 +70,12 @@ export class UniversalOutputNode extends Classic.Node<{ signal: Classic.Socket }
     gain.connect(this.freqAnalyserNode)
     return {
       value: val
+    }
+  }
+
+  serialize() {
+    return {
+      gain: this.controls.gain.value
     }
   }
 }

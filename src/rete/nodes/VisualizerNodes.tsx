@@ -24,6 +24,10 @@ export class TimeDomainVisualizerNode extends Classic.Node<{ signal: Classic.Soc
 			value: this.analyserNode
 		}
 	}
+
+	serialize() {
+		return {}
+	}
 }
 
 export class FrequencyDomainVisualizerNode extends Classic.Node<{ signal: Classic.Socket }, {}, { visualizer: VisualizerControl }> {
@@ -47,5 +51,9 @@ export class FrequencyDomainVisualizerNode extends Classic.Node<{ signal: Classi
 		return {
 			value: this.analyserNode
 		}
+	}
+
+	serialize() {
+		return {}
 	}
 }
