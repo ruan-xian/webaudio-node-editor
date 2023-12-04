@@ -38,10 +38,8 @@ import { EditorConstantNode } from './nodes/EditorConstantNode';
 import { TimeDomainVisualizerNode, FrequencyDomainVisualizerNode } from './nodes/VisualizerNodes';
 
 type Node = | EditorConstantNode | AudioOutputNode | EditorOscillatorNode | EditorGainNode | TimeDomainVisualizerNode | FrequencyDomainVisualizerNode | EditorNoiseNode;
-type Conn =
-| Connection<EditorOscillatorNode, AudioOutputNode> 
-| Connection<EditorOscillatorNode, EditorOscillatorNode> 
-| Connection<EditorConstantNode, EditorOscillatorNode> 
+type Conn = Connection<Node,Node>
+| Connection<EditorGainNode, AudioOutputNode> 
 | Connection<EditorGainNode, TimeDomainVisualizerNode>
 | Connection<EditorGainNode, FrequencyDomainVisualizerNode>
 | Connection<EditorOscillatorNode, EditorGainNode>
@@ -123,8 +121,6 @@ export async function createEditor(container: HTMLElement) {
       await AreaExtensions.zoomAt(area, editor.getNodes());
     }
   });
-
-
 
   const contextMenu = new ContextMenuPlugin<Schemes>({
     items: ContextMenuPresets.classic.setup([
