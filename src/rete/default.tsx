@@ -34,27 +34,26 @@ import { VisualizerControl, CustomVisualizerOutput } from './controls/Visualizer
 import { EditorOscillatorNode } from './nodes/EditorOscillatorNode';
 import { EditorNoiseNode } from './nodes/EditorNoiseNode';
 import { EditorGainNode } from './nodes/EditorGainNode';
-import { AudioOutputNode } from './nodes/AudioOutputNode';
+import { AudioOutputNode, UniversalOutputNode } from './nodes/AudioOutputNode';
 import { EditorConstantNode } from './nodes/EditorConstantNode';
 import { TimeDomainVisualizerNode, FrequencyDomainVisualizerNode } from './nodes/VisualizerNodes';
 import { EditorBiquadNode } from './nodes/EditorBiquadNode';
 import { ClipNode } from './nodes/ClipNode';
 
-type Node = 
-| EditorConstantNode 
-| AudioOutputNode 
-| EditorOscillatorNode 
-| EditorGainNode 
-| TimeDomainVisualizerNode 
-| FrequencyDomainVisualizerNode 
-| EditorNoiseNode 
-| EditorBiquadNode 
-| ClipNode;
-type Conn = Connection<Node,Node>
-| Connection<EditorGainNode, AudioOutputNode> 
-| Connection<EditorGainNode, TimeDomainVisualizerNode>
-| Connection<EditorGainNode, FrequencyDomainVisualizerNode>
-| Connection<EditorOscillatorNode, EditorGainNode>
+type Node =
+  | EditorConstantNode
+  | AudioOutputNode
+  | UniversalOutputNode
+  | EditorOscillatorNode
+  | EditorGainNode
+  | TimeDomainVisualizerNode
+  | FrequencyDomainVisualizerNode
+  | EditorNoiseNode
+  | EditorBiquadNode
+  | ClipNode;
+type Conn = Connection<Node, Node>
+  | Connection<EditorGainNode, UniversalOutputNode>
+  | Connection<EditorOscillatorNode, EditorGainNode>
 type Schemes = GetSchemes<Node, Conn>;
 class Connection<A extends Node, B extends Node> extends Classic.Connection<
   A,
@@ -67,7 +66,6 @@ export const socket = new Classic.Socket('socket');
 
 export const audioCtx = new window.AudioContext();
 export const globalGain = audioCtx.createGain();
-globalGain.gain.value = 0;
 const globalCompressor = audioCtx.createDynamicsCompressor();
 globalGain.connect(globalCompressor).connect(audioCtx.destination);
 export const audioSources: AudioScheduledSourceNode[] = [];
@@ -123,13 +121,13 @@ class SmoothZoom extends Zoom {
 
   screenToArea(x: number, y: number, t: any) {
     const { x: tx, y: ty, k } = t;
-  
+
     return { x: (x - tx) / k, y: (y - ty) / k };
   }
-  
+
   areaToScreen(x: number, y: number, t: any) {
     const { x: tx, y: ty, k } = t;
-  
+
     return { x: x * k + tx, y: y * k + ty };
   }
 
@@ -146,7 +144,7 @@ class SmoothZoom extends Zoom {
     e.preventDefault();
 
     const isNegative = e.deltaY < 0;
-    const delta = isNegative ? this.intensity : -this.intensity*0.75;
+    const delta = isNegative ? this.intensity : -this.intensity * 0.75;
     const { left, top } = this.container.getBoundingClientRect();
     const ox = e.clientX - left;
     const oy = e.clientY - top;
@@ -221,13 +219,14 @@ export async function createEditor(container: HTMLElement) {
       ["Gain", () => new EditorGainNode(1, process)],
       ["Biquad Filter", () => new EditorBiquadNode(process)],
       ["Clip", () => new ClipNode(process)],
-      ["Noise", 
-      [["Brown Noise", () => new EditorNoiseNode("Brown Noise")],
-      ["White Noise", () => new EditorNoiseNode("White Noise")]]],
-      ["Outputs", 
-      [["AudioOutput", () => new AudioOutputNode(process)],
-      ["Time Domain Visualizer", () => new TimeDomainVisualizerNode()],
-      ["Frequency Domain Visualizer", () => new FrequencyDomainVisualizerNode()]]]
+      ["Noise",
+        [["Brown Noise", () => new EditorNoiseNode("Brown Noise")],
+        ["White Noise", () => new EditorNoiseNode("White Noise")]]],
+      ["Outputs",
+        [["Universal Output", () => new UniversalOutputNode(process)],
+        ["Audio Output", () => new AudioOutputNode(process)],
+        ["Time Domain Visualizer", () => new TimeDomainVisualizerNode()],
+        ["Frequency Domain Visualizer", () => new FrequencyDomainVisualizerNode()]]]
     ])
   });
 
@@ -279,22 +278,16 @@ export async function createEditor(container: HTMLElement) {
 
   const osc = new EditorOscillatorNode(process);
   const gain = new EditorGainNode(0.5, process);
-  const visualizer = new TimeDomainVisualizerNode();
-  const freqVisualizer = new FrequencyDomainVisualizerNode();
-  const output = new AudioOutputNode(process);
+  const output = new UniversalOutputNode(process);
 
   await editor.addNode(osc);
   await editor.addNode(gain);
-  await editor.addNode(visualizer);
-  await editor.addNode(freqVisualizer);
   await editor.addNode(output);
 
   var c = new Connection(osc, 'signal', gain, 'signal')
 
   await editor.addConnection(c);
-  await editor.addConnection(new Connection(gain, 'signal', visualizer, 'signal'));
   await editor.addConnection(new Connection(gain, 'signal', output, 'signal'));
-  await editor.addConnection(new Connection(gain, 'signal', freqVisualizer, 'signal'));
 
   await arrange.layout({ applier });
   AreaExtensions.zoomAt(area, editor.getNodes());
