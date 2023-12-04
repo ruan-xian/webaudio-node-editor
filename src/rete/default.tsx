@@ -40,21 +40,38 @@ import { TimeDomainVisualizerNode, FrequencyDomainVisualizerNode } from './nodes
 import { EditorBiquadNode } from './nodes/EditorBiquadNode';
 import { ClipNode } from './nodes/ClipNode';
 
-type Node =
+import { OutputNodeStyle, SourceNodeStyle } from './nodestyles';
+
+type SourceNode =
   | EditorConstantNode
-  | AudioOutputNode
-  | UniversalOutputNode
   | EditorOscillatorNode
+  | EditorNoiseNode
+
+const sourceNodeTypes = [EditorConstantNode, EditorOscillatorNode, EditorNoiseNode]
+
+type ModifierNode =
   | EditorGainNode
+  | EditorBiquadNode
+  | ClipNode
+
+const modifierNodeTypes = [EditorGainNode, EditorBiquadNode, ClipNode]
+
+type OutputNode =
+  | UniversalOutputNode
+  | AudioOutputNode
   | TimeDomainVisualizerNode
   | FrequencyDomainVisualizerNode
-  | EditorNoiseNode
-  | EditorBiquadNode
-  | ClipNode;
+
+const outputNodeTypes = [UniversalOutputNode, AudioOutputNode, TimeDomainVisualizerNode, FrequencyDomainVisualizerNode]
+
+type Node =
+  | SourceNode
+  | ModifierNode
+  | OutputNode;
 type Conn = Connection<Node, Node>
   | Connection<EditorGainNode, UniversalOutputNode>
   | Connection<EditorOscillatorNode, EditorGainNode>
-type Schemes = GetSchemes<Node, Conn>;
+export type Schemes = GetSchemes<Node, Conn>;
 class Connection<A extends Node, B extends Node> extends Classic.Connection<
   A,
   B
@@ -269,6 +286,18 @@ export async function createEditor(container: HTMLElement) {
         }
         if (data.payload instanceof Classic.InputControl) {
           return Presets.classic.Control;
+        }
+        return null;
+      },
+      node(context) {
+        if (outputNodeTypes.some((c) => context.payload instanceof c)) {
+          return OutputNodeStyle;
+        }
+        if (sourceNodeTypes.some((c) => context.payload instanceof c)) {
+          return SourceNodeStyle;
+        }
+        if (context.payload instanceof Classic.Node) {
+          return Presets.classic.Node;
         }
         return null;
       }
