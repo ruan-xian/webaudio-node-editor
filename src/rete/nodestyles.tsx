@@ -2,15 +2,18 @@ import { Presets } from "rete-react-plugin";
 import { css } from "styled-components";
 
 const OutputStyle = css<{ selected?: boolean }>`
-  background: grey;
+  background: #e3e3e388;
+  border-color: white;
 `;
 
 const SourceStyle = css<{ selected?: boolean }>`
-  background: #77beed;
+  background: #a3a3a388;
+  border-color: white;
 `;
 
 const ModifierStyle = css<{ selected?: boolean }>`
-  background: #4cad5a;
+  background: #c3c3c388;
+  border-color: white;
 `;
 
 export function OutputNodeStyle(props: any) {

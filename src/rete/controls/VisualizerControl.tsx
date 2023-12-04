@@ -26,11 +26,13 @@ export function CustomVisualizerOutput(props: { data: VisualizerControl }) {
           var dataArray = new Uint8Array(bufferLength);
           props.data.analyserNode.getByteTimeDomainData(dataArray);
       
-          canvasCtx.fillStyle = "white";
+          //canvasCtx.fillStyle = "white";
+          canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
+          canvasCtx.fillStyle = "rgba(0,0,0,0.3)";
           canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
       
           canvasCtx.lineWidth = 2;
-          canvasCtx.strokeStyle = "rgb(0, 0, 0)";
+          canvasCtx.strokeStyle = "white";
       
           canvasCtx.beginPath();
       
@@ -61,12 +63,13 @@ export function CustomVisualizerOutput(props: { data: VisualizerControl }) {
           const height_mult = canvas.height / 255 * 0.9;
           let start = 0;
 
-          canvasCtx.fillStyle = "white";
+          canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
+          canvasCtx.fillStyle = "rgba(0,0,0,0.3)";
           canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
 
           for (let i = 0; i < fftData.length; i++) {
             start = i * bar_spacing;
-            canvasCtx.fillStyle = "black";
+            canvasCtx.fillStyle = "white";
             canvasCtx.fillRect(start, canvasRef.current.height, bar_width, height_mult * -fftData[i]);
           }
         }

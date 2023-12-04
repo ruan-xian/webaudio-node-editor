@@ -184,7 +184,9 @@ export async function createEditor(container: HTMLElement) {
   });
 
   AreaExtensions.selectableNodes(area, AreaExtensions.selector(), {
-    accumulating: AreaExtensions.accumulateOnCtrl()
+    accumulating: {
+      active: () => false
+    }
   });
   AreaExtensions.showInputControl(area);
 
