@@ -7,6 +7,7 @@ import { EditorConstantNode } from './nodes/EditorConstantNode';
 import { TimeDomainVisualizerNode, FrequencyDomainVisualizerNode } from './nodes/VisualizerNodes';
 import { EditorBiquadNode } from './nodes/EditorBiquadNode';
 import { ClipNode } from './nodes/ClipNode';
+import { NoteFrequencyNode } from "./nodes/NoteFrequencyNode";
 
 export async function createNode(
   { editor, area, dataflow, process }: Context,
@@ -30,6 +31,8 @@ export async function createNode(
 			return new EditorNoiseNode(process, data);
 		case "Oscillator":
 			return new EditorOscillatorNode(process, data);
+    case "Note Frequency":
+      return new NoteFrequencyNode(process, data);
     case "Time Domain Visualizer":
       return new TimeDomainVisualizerNode();
     case "Frequency Domain Visualizer":

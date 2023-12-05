@@ -37,6 +37,7 @@ import { EditorConstantNode } from './nodes/EditorConstantNode';
 import { TimeDomainVisualizerNode, FrequencyDomainVisualizerNode } from './nodes/VisualizerNodes';
 import { EditorBiquadNode } from './nodes/EditorBiquadNode';
 import { ClipNode } from './nodes/ClipNode';
+import { NoteFrequencyNode } from './nodes/NoteFrequencyNode';
 
 import { ModifierNodeStyle, OutputNodeStyle, SourceNodeStyle } from './styles/nodestyles';
 import { CustomConnection } from './styles/connectionstyles';
@@ -49,19 +50,22 @@ import { CustomSocket } from './styles/socketstyles';
 import brookExample from './examples/brook.json';
 import amfmExample from './examples/amfm.json'
 import jetEngineExample from './examples/jetengine.json'
+import chordExample from './examples/chord.json'
 
 const examples: { [key in string]: any } = {
   "Babbling Brook (HW3)": brookExample,
   "AM+FM Synthesis": amfmExample,
   "Jet Engine": jetEngineExample,
+  "Chord": chordExample
 }
 
 type SourceNode =
   | EditorConstantNode
   | EditorOscillatorNode
   | EditorNoiseNode
+  | NoteFrequencyNode
 
-const sourceNodeTypes = [EditorConstantNode, EditorOscillatorNode, EditorNoiseNode]
+const sourceNodeTypes = [EditorConstantNode, EditorOscillatorNode, EditorNoiseNode, NoteFrequencyNode]
 
 type ModifierNode =
   | EditorGainNode
@@ -172,6 +176,7 @@ export async function createEditor(container: HTMLElement) {
   const contextMenu = new ContextMenuPlugin<Schemes>({
     items: ContextMenuPresets.classic.setup([
       ["Constant", () => new EditorConstantNode(process)],
+      ["Note Frequency", () => new NoteFrequencyNode(process)],
       ["Oscillator", () => new EditorOscillatorNode(process)],
       ["Gain", () => new EditorGainNode(process)],
       ["Biquad Filter", () => new EditorBiquadNode(process)],

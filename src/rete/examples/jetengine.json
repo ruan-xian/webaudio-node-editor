@@ -240,15 +240,29 @@
 			"data": {
 				"gain": 1
 			}
+		},
+		{
+			"id": "020ca3973b60564f",
+			"name": "Time Domain Visualizer",
+			"data": {}
+		},
+		{
+			"id": "44b622038179e9f7",
+			"name": "Time Domain Visualizer",
+			"data": {}
+		},
+		{
+			"id": "4bcbaf33a00c655d",
+			"name": "Frequency Domain Visualizer",
+			"data": {}
+		},
+		{
+			"id": "ad0e6e24c7cdcbf7",
+			"name": "Frequency Domain Visualizer",
+			"data": {}
 		}
 	],
 	"connections": [
-		{
-			"source": "13b244e074c36161",
-			"sourceOutput": "signal",
-			"target": "df1ea31217cd0d3f",
-			"targetInput": "signal"
-		},
 		{
 			"source": "4e7567fdaecdc876",
 			"sourceOutput": "signal",
@@ -475,6 +489,36 @@
 			"source": "ec1dfd7450a225e3",
 			"sourceOutput": "signal",
 			"target": "d663f381ecf84317",
+			"targetInput": "signal"
+		},
+		{
+			"source": "a549b26138870c74",
+			"sourceOutput": "signal",
+			"target": "020ca3973b60564f",
+			"targetInput": "signal"
+		},
+		{
+			"source": "aeaa0eaf654203e8",
+			"sourceOutput": "signal",
+			"target": "44b622038179e9f7",
+			"targetInput": "signal"
+		},
+		{
+			"source": "a549b26138870c74",
+			"sourceOutput": "signal",
+			"target": "4bcbaf33a00c655d",
+			"targetInput": "signal"
+		},
+		{
+			"source": "aeaa0eaf654203e8",
+			"sourceOutput": "signal",
+			"target": "ad0e6e24c7cdcbf7",
+			"targetInput": "signal"
+		},
+		{
+			"source": "13b244e074c36161",
+			"sourceOutput": "signal",
+			"target": "df1ea31217cd0d3f",
 			"targetInput": "signal"
 		}
 	]

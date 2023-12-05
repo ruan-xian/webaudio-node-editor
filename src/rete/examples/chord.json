@@ -1,0 +1,138 @@
+{
+	"nodes": [
+		{
+			"id": "6c235b85e9207e2f",
+			"name": "Oscillator",
+			"data": {
+				"baseFreq": 440,
+				"waveform": "sine"
+			}
+		},
+		{
+			"id": "2b6c4d44d4f69ef6",
+			"name": "Gain",
+			"data": {
+				"gain": 0.2
+			}
+		},
+		{
+			"id": "a742397e3e6cf5ad",
+			"name": "Universal Output",
+			"data": {
+				"gain": 1
+			}
+		},
+		{
+			"id": "9a3ce700284ae274",
+			"name": "Note Frequency",
+			"data": {
+				"octave": 3,
+				"note": "7"
+			}
+		},
+		{
+			"id": "9158c035be4da8c9",
+			"name": "Note Frequency",
+			"data": {
+				"octave": 3,
+				"note": "3"
+			}
+		},
+		{
+			"id": "825965ae7cf0e811",
+			"name": "Oscillator",
+			"data": {
+				"baseFreq": 440,
+				"waveform": "sine"
+			}
+		},
+		{
+			"id": "051ec48cb7a4c245",
+			"name": "Note Frequency",
+			"data": {
+				"octave": 4,
+				"note": "2"
+			}
+		},
+		{
+			"id": "1b521693124a65ac",
+			"name": "Oscillator",
+			"data": {
+				"baseFreq": 440,
+				"waveform": "sine"
+			}
+		},
+		{
+			"id": "168f3351a007a05d",
+			"name": "Note Frequency",
+			"data": {
+				"octave": 3,
+				"note": "10"
+			}
+		},
+		{
+			"id": "72da2ef00bdfcc04",
+			"name": "Oscillator",
+			"data": {
+				"baseFreq": 440,
+				"waveform": "sine"
+			}
+		}
+	],
+	"connections": [
+		{
+			"source": "2b6c4d44d4f69ef6",
+			"sourceOutput": "signal",
+			"target": "a742397e3e6cf5ad",
+			"targetInput": "signal"
+		},
+		{
+			"source": "9a3ce700284ae274",
+			"sourceOutput": "value",
+			"target": "6c235b85e9207e2f",
+			"targetInput": "baseFrequency"
+		},
+		{
+			"source": "9158c035be4da8c9",
+			"sourceOutput": "value",
+			"target": "825965ae7cf0e811",
+			"targetInput": "baseFrequency"
+		},
+		{
+			"source": "825965ae7cf0e811",
+			"sourceOutput": "signal",
+			"target": "2b6c4d44d4f69ef6",
+			"targetInput": "signal"
+		},
+		{
+			"source": "1b521693124a65ac",
+			"sourceOutput": "signal",
+			"target": "2b6c4d44d4f69ef6",
+			"targetInput": "signal"
+		},
+		{
+			"source": "168f3351a007a05d",
+			"sourceOutput": "value",
+			"target": "72da2ef00bdfcc04",
+			"targetInput": "baseFrequency"
+		},
+		{
+			"source": "72da2ef00bdfcc04",
+			"sourceOutput": "signal",
+			"target": "2b6c4d44d4f69ef6",
+			"targetInput": "signal"
+		},
+		{
+			"source": "051ec48cb7a4c245",
+			"sourceOutput": "value",
+			"target": "1b521693124a65ac",
+			"targetInput": "baseFrequency"
+		},
+		{
+			"source": "6c235b85e9207e2f",
+			"sourceOutput": "signal",
+			"target": "2b6c4d44d4f69ef6",
+			"targetInput": "signal"
+		}
+	]
+}
