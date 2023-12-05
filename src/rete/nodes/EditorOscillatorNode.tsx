@@ -5,7 +5,7 @@ import { DropdownControl } from "../controls/DropdownControl"
 
 export class EditorOscillatorNode extends Classic.Node<{ baseFrequency: Classic.Socket, frequency: Classic.Socket }, { signal: Classic.Socket }, { waveform: DropdownControl }> {
 	width = 180
-	height = 200
+	height = 210
 	constructor(change: () => void, initial?: { baseFreq: number, waveform: string }) {
 		super('Oscillator');
 

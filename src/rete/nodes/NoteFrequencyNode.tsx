@@ -1,10 +1,11 @@
 import { ClassicPreset as Classic } from "rete"
 import { socket, audioCtx, audioSources, audioSourceStates } from "../default"
 import { DropdownControl } from "../controls/DropdownControl";
+import { LabeledInputControl } from "../controls/LabeledInputControl";
 
-export class NoteFrequencyNode extends Classic.Node<{}, { value: Classic.Socket }, { note: DropdownControl, octave: Classic.InputControl<"number", number> }> {
+export class NoteFrequencyNode extends Classic.Node<{}, { value: Classic.Socket }, { note: DropdownControl, octave: LabeledInputControl }> {
 	width = 180
-	height = 160
+	height = 185
 	constructor(change: () => void, initial?: { octave: number, note: string }) {
 		super('Note Frequency');
 
@@ -28,7 +29,7 @@ export class NoteFrequencyNode extends Classic.Node<{}, { value: Classic.Socket 
 
 		this.addControl(
 			'octave',
-			new Classic.InputControl('number', { initial: initial ? initial.octave : 4, change })
+			new LabeledInputControl(initial ? initial.octave : 4, "Octave", change)
 		);
 	}
 

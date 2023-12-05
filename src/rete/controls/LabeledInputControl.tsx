@@ -7,5 +7,5 @@ export class LabeledInputControl extends Classic.InputControl<"number"> {
 }
 
 export function CustomLabeledInputControl(props: { data: LabeledInputControl }) {
-	return (<div>{props.data.label}{Presets.classic.Control({ data: props.data })}</div>);
+	return (<div><div style={{ padding: "5px 6px"}}>{props.data.label}</div>{Presets.classic.Control({ data: props.data })}</div>);
 }

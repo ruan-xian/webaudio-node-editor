@@ -5,7 +5,7 @@ import { DropdownControl } from "../controls/DropdownControl"
 
 export class EditorBiquadNode extends Classic.Node<{ signal: Classic.Socket, frequency: Classic.Socket, q: Classic.Socket, gain: Classic.Socket }, { signal: Classic.Socket }, { filterType: DropdownControl }> {
 	width = 180
-	height = 300
+	height = 320
 	constructor(change: () => void, initial?: {freq: number, q: number, gain: number, filterType: string}) {
 		super('Biquad Filter');
 

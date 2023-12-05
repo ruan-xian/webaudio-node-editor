@@ -4,7 +4,7 @@ import { LabeledInputControl } from "../controls/LabeledInputControl"
 
 export class ClipNode extends Classic.Node<{ signal: Classic.Socket }, { signal: Classic.Socket }, { amp: LabeledInputControl }> {
 	width = 180
-	height = 170
+	height = 175
 	constructor(change: () => void, initial?: { amp: number }) {
 		super('Clip Signal');
 

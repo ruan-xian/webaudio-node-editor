@@ -51,6 +51,7 @@ import brookExample from './examples/brook.json';
 import amfmExample from './examples/amfm.json'
 import jetEngineExample from './examples/jetengine.json'
 import chordExample from './examples/chord.json'
+import { CustomContextMenu } from './styles/contextstyles';
 
 const examples: { [key in string]: any } = {
   "Babbling Brook (HW3)": brookExample,
@@ -257,7 +258,7 @@ export async function createEditor(container: HTMLElement) {
       }
     }
   }));
-  reactRender.addPreset(Presets.contextMenu.setup({ delay: 200 }));
+  reactRender.addPreset(Presets.contextMenu.setup({ customize: CustomContextMenu, delay: 200 }));
 
   const osc = new EditorOscillatorNode(process);
   const gain = new EditorGainNode(process, { gain: 0.5 });
