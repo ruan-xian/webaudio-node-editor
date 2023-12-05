@@ -48,10 +48,12 @@ import { CustomSocket } from './styles/socketstyles';
 
 import brookExample from './examples/brook.json';
 import amfmExample from './examples/amfm.json'
+import jetEngineExample from './examples/jetengine.json'
 
 const examples: { [key in string]: any } = {
   "Babbling Brook (HW3)": brookExample,
   "AM+FM Synthesis": amfmExample,
+  "Jet Engine": jetEngineExample,
 }
 
 type SourceNode =

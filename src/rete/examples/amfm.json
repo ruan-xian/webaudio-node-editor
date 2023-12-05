@@ -1,1 +1,94 @@
-{"nodes":[{"id":"fd6bbc5f9754162f","name":"Oscillator","data":{"baseFreq":440,"waveform":"triangle"}},{"id":"eaf61eeae013a92e","name":"Gain","data":{"gain":0.5}},{"id":"e28d78cfb85364af","name":"Universal Output","data":{"gain":1}},{"id":"79e92d958baff7f5","name":"Oscillator","data":{"baseFreq":8,"waveform":"triangle"}},{"id":"63863aafacb20fd9","name":"Gain","data":{"gain":8}},{"id":"805296b4c54b1660","name":"Oscillator","data":{"baseFreq":100,"waveform":"triangle"}},{"id":"f8572925cd49003e","name":"Gain","data":{"gain":0.5}}],"connections":[{"source":"eaf61eeae013a92e","sourceOutput":"signal","target":"e28d78cfb85364af","targetInput":"signal"},{"source":"fd6bbc5f9754162f","sourceOutput":"signal","target":"eaf61eeae013a92e","targetInput":"signal"},{"source":"79e92d958baff7f5","sourceOutput":"signal","target":"63863aafacb20fd9","targetInput":"signal"},{"source":"63863aafacb20fd9","sourceOutput":"signal","target":"fd6bbc5f9754162f","targetInput":"frequency"},{"source":"805296b4c54b1660","sourceOutput":"signal","target":"f8572925cd49003e","targetInput":"signal"},{"source":"f8572925cd49003e","sourceOutput":"signal","target":"eaf61eeae013a92e","targetInput":"baseGain"}]}
+{
+	"nodes": [
+		{
+			"id": "fd6bbc5f9754162f",
+			"name": "Oscillator",
+			"data": {
+				"baseFreq": 440,
+				"waveform": "triangle"
+			}
+		},
+		{
+			"id": "eaf61eeae013a92e",
+			"name": "Gain",
+			"data": {
+				"gain": 0.5
+			}
+		},
+		{
+			"id": "e28d78cfb85364af",
+			"name": "Universal Output",
+			"data": {
+				"gain": 1
+			}
+		},
+		{
+			"id": "79e92d958baff7f5",
+			"name": "Oscillator",
+			"data": {
+				"baseFreq": 8,
+				"waveform": "triangle"
+			}
+		},
+		{
+			"id": "63863aafacb20fd9",
+			"name": "Gain",
+			"data": {
+				"gain": 8
+			}
+		},
+		{
+			"id": "805296b4c54b1660",
+			"name": "Oscillator",
+			"data": {
+				"baseFreq": 100,
+				"waveform": "triangle"
+			}
+		},
+		{
+			"id": "f8572925cd49003e",
+			"name": "Gain",
+			"data": {
+				"gain": 0.5
+			}
+		}
+	],
+	"connections": [
+		{
+			"source": "eaf61eeae013a92e",
+			"sourceOutput": "signal",
+			"target": "e28d78cfb85364af",
+			"targetInput": "signal"
+		},
+		{
+			"source": "fd6bbc5f9754162f",
+			"sourceOutput": "signal",
+			"target": "eaf61eeae013a92e",
+			"targetInput": "signal"
+		},
+		{
+			"source": "79e92d958baff7f5",
+			"sourceOutput": "signal",
+			"target": "63863aafacb20fd9",
+			"targetInput": "signal"
+		},
+		{
+			"source": "63863aafacb20fd9",
+			"sourceOutput": "signal",
+			"target": "fd6bbc5f9754162f",
+			"targetInput": "frequency"
+		},
+		{
+			"source": "805296b4c54b1660",
+			"sourceOutput": "signal",
+			"target": "f8572925cd49003e",
+			"targetInput": "signal"
+		},
+		{
+			"source": "f8572925cd49003e",
+			"sourceOutput": "signal",
+			"target": "eaf61eeae013a92e",
+			"targetInput": "baseGain"
+		}
+	]
+}

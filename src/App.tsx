@@ -20,7 +20,7 @@ function App() {
 
   return (
     <Layout style={{ display: 'flex', height: '100vh', backgroundImage: "linear-gradient(to bottom right, CornflowerBlue, Pink)" }}>
-      <Flex gap="small" className="header" align="center" style={{ backgroundColor: 'rgba(0,0,0,0.3)', padding: '0.5em' }}>
+      <Flex gap="small" className="header" align="center" style={{ backgroundColor: 'rgba(0,0,0,0.3)', padding: '0.5em 1em' }}>
         <div className='App-header'>WebAudio Node Editor</div>
         <div style={{ flexGrow: 1 }} />
         <Button onClick={() => editor?.layout(true)}>Auto-arrange nodes</Button>
@@ -33,7 +33,7 @@ function App() {
         color: 'white',
       }} />
 
-      <Flex gap="small" className="header" align="center" style={{ backgroundColor: 'rgba(0,0,0,0.3)', padding: '0.5em' }}>
+      <Flex gap="small" className="header" align="center" style={{ backgroundColor: 'rgba(0,0,0,0.3)', padding: '0.5em 1em' }}>
         <Button onClick={() => editor.loadExample(selectedExample)}>Load Example</Button>
         <Select defaultValue="Babbling Brook (HW3)" options={examples.map((exampleName: string) => ({label: exampleName, value: exampleName}))} style={{ width: 200 }} onChange={(value) => selectedExample = value}/>
         <div style={{ flexGrow: 1 }} />
