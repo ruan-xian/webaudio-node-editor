@@ -5,7 +5,7 @@ import { VisualizerControl } from "../controls/VisualizerControl"
 
 export class AudioOutputNode extends Classic.Node<{ signal: Classic.Socket }, {}, {}> {
   width = 180
-  height = 140
+  height = 80
   constructor(change: () => void) {
     super('Audio Output');
 

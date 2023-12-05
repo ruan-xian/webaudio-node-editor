@@ -38,11 +38,21 @@ import { TimeDomainVisualizerNode, FrequencyDomainVisualizerNode } from './nodes
 import { EditorBiquadNode } from './nodes/EditorBiquadNode';
 import { ClipNode } from './nodes/ClipNode';
 
-import { ModifierNodeStyle, OutputNodeStyle, SourceNodeStyle } from './nodestyles';
+import { ModifierNodeStyle, OutputNodeStyle, SourceNodeStyle } from './styles/nodestyles';
+import { CustomConnection } from './styles/connectionstyles';
 import { SmoothZoom } from './smoothzoom';
 
 import { importEditor, exportEditor } from './imports';
 import { clearEditor } from './utils';
+import { CustomSocket } from './styles/socketstyles';
+
+import brookExample from './examples/brook.json';
+import amfmExample from './examples/amfm.json'
+
+const examples: { [key in string]: any } = {
+  "Babbling Brook (HW3)": brookExample,
+  "AM+FM Synthesis": amfmExample,
+}
 
 type SourceNode =
   | EditorConstantNode
@@ -102,7 +112,6 @@ export function initAudio() {
     audioCtx.resume();
     process();
   } else {
-    globalGain.gain.value = 0;
     audioCtx.suspend();
   }
 }
@@ -232,6 +241,12 @@ export async function createEditor(container: HTMLElement) {
           return Presets.classic.Node;
         }
         return null;
+      },
+      connection(context) {
+        return CustomConnection;
+      },
+      socket(context) {
+        return CustomSocket;
       }
     }
   }));
@@ -250,7 +265,7 @@ export async function createEditor(container: HTMLElement) {
   await editor.addConnection(c);
   await editor.addConnection(new Connection<Node, Node>(gain, 'signal' as never, output, 'signal' as never));
 
-  await arrange.layout({ applier });
+  await arrange.layout({ applier: undefined });
   AreaExtensions.zoomAt(area, editor.getNodes());
 
   await editor.removeConnection(c.id);
@@ -269,6 +284,9 @@ export async function createEditor(container: HTMLElement) {
     await importEditor(context, data);
     await arrange.layout({ applier: undefined });
     AreaExtensions.zoomAt(area, editor.getNodes());
+  }
+  async function loadExample(exampleName: string) {
+    await loadEditor(examples[exampleName]);
   }
   async function saveEditor() {
     var data = exportEditor(context);
@@ -303,7 +321,7 @@ export async function createEditor(container: HTMLElement) {
       const handle = await window.showSaveFilePicker(fileOptions);
       return handle;
     }
-    
+
     async function writeFile(fileHandle: any, contents: any) {
       // Create a FileSystemWritableFileStream to write to.
       const writable = await fileHandle.createWritable();
@@ -330,5 +348,7 @@ export async function createEditor(container: HTMLElement) {
     importEditorFromFile,
     clearEditor: () => clearEditor(editor),
     destroy: () => area.destroy(),
+    getExamples() { return Object.keys(examples) },
+    loadExample
   };
 }

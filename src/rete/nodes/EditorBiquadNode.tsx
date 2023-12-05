@@ -37,8 +37,6 @@ export class EditorBiquadNode extends Classic.Node<{ signal: Classic.Socket, fre
 			{ value: "allpass", label: "allpass" },
 		]
 
-		console.log(initial?.filterType)
-
 		this.addControl("filterType", new DropdownControl(change, dropdownOptions, initial ? initial.filterType : "lowpass"))
 	}
 
