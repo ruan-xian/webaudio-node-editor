@@ -12,7 +12,7 @@
 			"id": "2b6c4d44d4f69ef6",
 			"name": "Gain",
 			"data": {
-				"gain": 0.2
+				"gain": 0.3
 			}
 		},
 		{
@@ -26,16 +26,16 @@
 			"id": "9a3ce700284ae274",
 			"name": "Note Frequency",
 			"data": {
-				"octave": 3,
-				"note": "7"
+				"octave": 4,
+				"note": "5"
 			}
 		},
 		{
 			"id": "9158c035be4da8c9",
 			"name": "Note Frequency",
 			"data": {
-				"octave": 3,
-				"note": "3"
+				"octave": 4,
+				"note": "0"
 			}
 		},
 		{
@@ -51,27 +51,11 @@
 			"name": "Note Frequency",
 			"data": {
 				"octave": 4,
-				"note": "2"
+				"note": "9"
 			}
 		},
 		{
 			"id": "1b521693124a65ac",
-			"name": "Oscillator",
-			"data": {
-				"baseFreq": 440,
-				"waveform": "sine"
-			}
-		},
-		{
-			"id": "168f3351a007a05d",
-			"name": "Note Frequency",
-			"data": {
-				"octave": 3,
-				"note": "10"
-			}
-		},
-		{
-			"id": "72da2ef00bdfcc04",
 			"name": "Oscillator",
 			"data": {
 				"baseFreq": 440,
@@ -106,18 +90,6 @@
 		},
 		{
 			"source": "1b521693124a65ac",
-			"sourceOutput": "signal",
-			"target": "2b6c4d44d4f69ef6",
-			"targetInput": "signal"
-		},
-		{
-			"source": "168f3351a007a05d",
-			"sourceOutput": "value",
-			"target": "72da2ef00bdfcc04",
-			"targetInput": "baseFrequency"
-		},
-		{
-			"source": "72da2ef00bdfcc04",
 			"sourceOutput": "signal",
 			"target": "2b6c4d44d4f69ef6",
 			"targetInput": "signal"

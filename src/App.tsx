@@ -34,8 +34,8 @@ function App() {
       }} />
 
       <Flex gap="small" className="header" align="center" style={{ backgroundColor: 'rgba(0,0,0,0.3)', padding: '0.5em 1em' }}>
-        <Button onClick={() => editor.loadExample(selectedExample)}>Load Example</Button>
         <Select defaultValue="Babbling Brook (HW3)" options={examples.map((exampleName: string) => ({label: exampleName, value: exampleName}))} style={{ width: 200 }} onChange={(value) => selectedExample = value}/>
+        <Button onClick={() => editor.loadExample(selectedExample)}>Load Example</Button>
         <div style={{ flexGrow: 1 }} />
         <Button onClick={() => editor?.importEditorFromFile()}>Import from file</Button>
         <Button onClick={() => editor?.exportEditorToFile()}>Export to file</Button>

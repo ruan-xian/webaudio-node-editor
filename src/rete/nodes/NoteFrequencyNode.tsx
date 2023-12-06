@@ -12,20 +12,20 @@ export class NoteFrequencyNode extends Classic.Node<{}, { value: Classic.Socket 
 		this.addOutput('value', new Classic.Output(socket, 'Frequency'));
 
 		const dropdownOptions = [
-			{ value: "0", label: "A" },
-			{ value: "1", label: "A#/B♭" },
-			{ value: "2", label: "B" },
-			{ value: "3", label: "C" },
-			{ value: "4", label: "C#/D♭" },
-			{ value: "5", label: "D" },
-			{ value: "6", label: "D#/E♭" },
-			{ value: "7", label: "E" },
-			{ value: "8", label: "F" },
-			{ value: "9", label: "F#/G♭" },
-			{ value: "10", label: "G" },
-			{ value: "11", label: "G#/A♭" },
+			{ value: "0", label: "C" },
+			{ value: "1", label: "C#/D♭" },
+			{ value: "2", label: "D" },
+			{ value: "3", label: "D#/E♭" },
+			{ value: "4", label: "E" },
+			{ value: "5", label: "F" },
+			{ value: "6", label: "F#/G♭" },
+			{ value: "7", label: "G" },
+			{ value: "8", label: "G#/A♭" },
+			{ value: "9", label: "A" },
+			{ value: "10", label: "A#/B♭" },
+			{ value: "11", label: "B" },
 		]
-		this.addControl("note", new DropdownControl(change, dropdownOptions, initial ? initial.note : "0"))
+		this.addControl("note", new DropdownControl(change, dropdownOptions, initial ? initial.note : "9"))
 
 		this.addControl(
 			'octave',
@@ -37,7 +37,7 @@ export class NoteFrequencyNode extends Classic.Node<{}, { value: Classic.Socket 
 		const constantNode = audioCtx.createConstantSource();
 		const noteVal = Number(this.controls.note.value)
 		const octave = this.controls.octave.value || 0
-		const val = 440 * Math.pow(2.0, (octave - 4) + (1.0 / 12) * noteVal);
+		const val = 261.625565300598634 * Math.pow(2.0, (octave - 4) + (1.0 / 12) * noteVal);
 
 		constantNode.offset.setValueAtTime(val, audioCtx.currentTime);
 
