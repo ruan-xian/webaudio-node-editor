@@ -1,8 +1,8 @@
 import { ClassicPreset as Classic } from "rete"
 import { Presets } from 'rete-react-plugin';
 export class LabeledInputControl extends Classic.InputControl<"number"> {
-	constructor(public value: number, public label: string, change?: () => void) {
-		super("number", { initial: value, change })
+	constructor(public value: number, public label: string, change?: () => void, readonly?: boolean) {
+		super("number", { initial: value, readonly: Boolean(readonly), change })
 	}
 }
 

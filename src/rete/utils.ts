@@ -20,8 +20,11 @@ export async function clearEditor(editor: NodeEditor<BaseSchemes>) {
   }
 }
 
+// export const cartesian = <T,>(sets: T[][]) =>
+//     sets.reduce<T[][]>((accSets, set) => accSets.flatMap(accSet => set.map(value => [...accSet, value])), [[]]);
+
 export const cartesian = <T extends unknown[]>(a: { [K in keyof T]: T[K][] }) => a.reduce<T[]>((b, c) => b.flatMap((d) => c.map((e) => [...d, e] as T)), [[]] as unknown as T[]);
 
 export function processBundledSignal(input?: AudioNode[][][]) {
-  return input ? cartesian(input.map(itm => itm.flat())) : [[]]
+  return input ? cartesian(input.flat()) : [[]]
 }

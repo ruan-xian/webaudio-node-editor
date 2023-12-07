@@ -1,5 +1,4 @@
 import { createEditor as createDefaultEditor } from './default'
-import { initAudio } from './default'
 
 const factory = {
   'default': createDefaultEditor,
@@ -15,6 +14,5 @@ if (!createEditor) {
 }
 
 export {
-  createEditor,
-  initAudio
+  createEditor
 }

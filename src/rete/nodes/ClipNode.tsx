@@ -34,7 +34,7 @@ export class ClipNode extends Classic.Node<{ signal: Classic.Socket }, { signal:
 
 			inSignal.forEach(sig => sig.connect(gain))
 
-			outputNodes.push(gain)
+			outputNodes.push(waveShaper)
 		}
 
 		return {

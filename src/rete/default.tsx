@@ -52,13 +52,13 @@ import amfmExample from './examples/amfm.json'
 import jetEngineExample from './examples/jetengine.json'
 import chordExample from './examples/chord.json'
 import { CustomContextMenu } from './styles/contextstyles';
-import { SignalBundlerNode, SignalFlattenerNode } from './nodes/SignalBundlerNode';
+import { BundleDebuggerNode, SignalBundlerNode, SignalFlattenerNode } from './nodes/SignalBundlerNode';
 
 const examples: { [key in string]: any } = {
-  "Babbling Brook (HW3)": brookExample,
-  "AM+FM Synthesis": amfmExample,
-  "Jet Engine": jetEngineExample,
-  "Chord": chordExample
+  "Babbling Brook (HW3)": {json: brookExample, concepts: "Filters, noise, signal addition"},
+  "AM+FM Synthesis": {json: amfmExample, concepts: "Synthesis, addition to base values"},
+  "Jet Engine": {json: jetEngineExample, concepts: "Multiparameter control with one constant node"},
+  "Chord": {json: chordExample, concepts: "Signal bundling, note frequency node"}
 }
 
 type SourceNode =
@@ -87,8 +87,9 @@ const outputNodeTypes = [UniversalOutputNode, AudioOutputNode, TimeDomainVisuali
 type BundlerNode =
   | SignalBundlerNode
   | SignalFlattenerNode
+  | BundleDebuggerNode
 
-const bundlerNodeTypes = [SignalBundlerNode, SignalFlattenerNode]
+const bundlerNodeTypes = [SignalBundlerNode, SignalFlattenerNode, BundleDebuggerNode]
 
 type Node =
   | SourceNode
@@ -122,10 +123,9 @@ globalGain.connect(globalCompressor).connect(audioCtx.destination);
 export const audioSources: AudioScheduledSourceNode[] = [];
 export const audioSourceStates: boolean[] = []
 
-export function initAudio() {
+function initAudio() {
   if (audioCtx.state === 'suspended') {
     audioCtx.resume();
-    process();
   } else {
     audioCtx.suspend();
   }
@@ -151,24 +151,27 @@ function killOscillators() {
   audioSourceStates.length = 0
 }
 
-const editor = new NodeEditor<Schemes>();
-const engine = new DataflowEngine<Schemes>();
 
-function process() {
-  engine.reset();
-
-  killOscillators();
-
-  editor
-    .getNodes()
-    .forEach((n) => engine.fetch(n.id));
-
-  setTimeout(reInitOscillators, 100);
-}
 
 export async function createEditor(container: HTMLElement) {
 
   const area = new AreaPlugin<Schemes, AreaExtra>(container);
+  const editor = new NodeEditor<Schemes>();
+  const engine = new DataflowEngine<Schemes>();
+  
+  function process() {
+    engine.reset();
+  
+    killOscillators();
+  
+    editor
+      .getNodes()
+      .filter((n) => outputNodeTypes.some(itm => n instanceof itm) || n instanceof BundleDebuggerNode)
+      .forEach((n) => engine.fetch(n.id));
+  
+    setTimeout(reInitOscillators, 100);
+  }
+
   const connection = new ConnectionPlugin<Schemes, AreaExtra>();
   const reactRender = new ReactPlugin<Schemes, AreaExtra>({ createRoot });
   const arrange = new AutoArrangePlugin<Schemes>();
@@ -197,9 +200,9 @@ export async function createEditor(container: HTMLElement) {
         ["Time Domain Visualizer", () => new TimeDomainVisualizerNode()],
         ["Frequency Domain Visualizer", () => new FrequencyDomainVisualizerNode()]]],
       ["Signal Bundling",
-        [["Signal Bundler", () => new SignalBundlerNode()],
-        ["Signal Flattener", () => new SignalFlattenerNode()]]]
-
+        [["Signal Bundler", () => new SignalBundlerNode((c) => area.update("control", c.id))],
+        ["Signal Flattener", () => new SignalFlattenerNode()],
+      ["Bundle Debugger", () => new BundleDebuggerNode((c) => area.update("control", c.id))]]]
     ])
   });
 
@@ -309,7 +312,10 @@ export async function createEditor(container: HTMLElement) {
     AreaExtensions.zoomAt(area, editor.getNodes());
   }
   async function loadExample(exampleName: string) {
-    await loadEditor(examples[exampleName]);
+    await loadEditor(examples[exampleName].json);
+  }
+  function GetExampleDescription(exampleName: string) {
+    return examples[exampleName].concepts;
   }
   async function saveEditor() {
     var data = exportEditor(context);
@@ -362,6 +368,11 @@ export async function createEditor(container: HTMLElement) {
     writeFile(hdl, JSON.stringify(data));
   }
 
+  function toggleAudio() {
+    initAudio();
+    process();
+  }
+
   return {
     layout: async (animate: boolean) => {
       await arrange.layout({ applier: animate ? applier : undefined });
@@ -372,6 +383,8 @@ export async function createEditor(container: HTMLElement) {
     clearEditor: () => clearEditor(editor),
     destroy: () => area.destroy(),
     getExamples() { return Object.keys(examples) },
-    loadExample
+    loadExample,
+    toggleAudio,
+    GetExampleDescription
   };
 }
