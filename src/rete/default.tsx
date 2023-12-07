@@ -39,7 +39,7 @@ import { EditorBiquadNode } from './nodes/EditorBiquadNode';
 import { ClipNode } from './nodes/ClipNode';
 import { NoteFrequencyNode } from './nodes/NoteFrequencyNode';
 
-import { ModifierNodeStyle, OutputNodeStyle, SourceNodeStyle } from './styles/nodestyles';
+import { BundlerNodeStyle, ModifierNodeStyle, OutputNodeStyle, SourceNodeStyle } from './styles/nodestyles';
 import { CustomConnection } from './styles/connectionstyles';
 import { SmoothZoom } from './smoothzoom';
 
@@ -52,6 +52,7 @@ import amfmExample from './examples/amfm.json'
 import jetEngineExample from './examples/jetengine.json'
 import chordExample from './examples/chord.json'
 import { CustomContextMenu } from './styles/contextstyles';
+import { SignalBundlerNode, SignalFlattenerNode } from './nodes/SignalBundlerNode';
 
 const examples: { [key in string]: any } = {
   "Babbling Brook (HW3)": brookExample,
@@ -83,10 +84,17 @@ type OutputNode =
 
 const outputNodeTypes = [UniversalOutputNode, AudioOutputNode, TimeDomainVisualizerNode, FrequencyDomainVisualizerNode]
 
+type BundlerNode =
+  | SignalBundlerNode
+  | SignalFlattenerNode
+
+const bundlerNodeTypes = [SignalBundlerNode, SignalFlattenerNode]
+
 type Node =
   | SourceNode
   | ModifierNode
-  | OutputNode;
+  | OutputNode
+  | BundlerNode;
 
 type Conn = Connection<Node, Node>
 export type Schemes = GetSchemes<Node, Conn>;
@@ -187,7 +195,11 @@ export async function createEditor(container: HTMLElement) {
         [["Universal Output", () => new UniversalOutputNode(process)],
         ["Audio Output", () => new AudioOutputNode(process)],
         ["Time Domain Visualizer", () => new TimeDomainVisualizerNode()],
-        ["Frequency Domain Visualizer", () => new FrequencyDomainVisualizerNode()]]]
+        ["Frequency Domain Visualizer", () => new FrequencyDomainVisualizerNode()]]],
+      ["Signal Bundling",
+        [["Signal Bundler", () => new SignalBundlerNode()],
+        ["Signal Flattener", () => new SignalFlattenerNode()]]]
+
     ])
   });
 
@@ -244,6 +256,9 @@ export async function createEditor(container: HTMLElement) {
         }
         if (modifierNodeTypes.some((c) => context.payload instanceof c)) {
           return ModifierNodeStyle;
+        }
+        if (bundlerNodeTypes.some((c) => context.payload instanceof c)) {
+          return BundlerNodeStyle;
         }
         if (context.payload instanceof Classic.Node) {
           return Presets.classic.Node;

@@ -2,6 +2,7 @@ import { ClassicPreset as Classic } from "rete"
 import { socket, audioCtx } from "../default"
 import { LabeledInputControl } from "../controls/LabeledInputControl"
 import { DropdownControl } from "../controls/DropdownControl"
+import { processBundledSignal } from "../utils"
 
 export class EditorBiquadNode extends Classic.Node<{ signal: Classic.Socket, frequency: Classic.Socket, q: Classic.Socket, gain: Classic.Socket }, { signal: Classic.Socket }, { filterType: DropdownControl }> {
 	width = 180
@@ -40,42 +41,62 @@ export class EditorBiquadNode extends Classic.Node<{ signal: Classic.Socket, fre
 		this.addControl("filterType", new DropdownControl(change, dropdownOptions, initial ? initial.filterType : "lowpass"))
 	}
 
-	data(inputs: { signal?: AudioNode[], frequency?: AudioNode[], q?: AudioNode[], gain?: AudioNode[] }): { signal: AudioNode } {
-		const bqNode = audioCtx.createBiquadFilter();
+	data(inputs: { signal?: AudioNode[][][], frequency?: AudioNode[][][], q?: AudioNode[][][], gain?: AudioNode[][][] }): { signal: AudioNode[][] } {
 
 		const freqControl = this.inputs.frequency?.control;
 		const qControl = this.inputs.q?.control;
 		const gainControl = this.inputs.gain?.control;
+		const filterType = this.controls.filterType.value as BiquadFilterType
 
-		if (inputs.signal) {
-			inputs.signal.forEach(itm => itm.connect(bqNode));
+		const signal = processBundledSignal(inputs.signal)
+		const frequency = processBundledSignal(inputs.frequency)
+		const qs = processBundledSignal(inputs.q)
+		const gain = processBundledSignal(inputs.gain)
+
+		function getBqNode(frequency: AudioNode[], q: AudioNode[], gain: AudioNode[]) {
+			const bqNode = audioCtx.createBiquadFilter();
+	
+			if (frequency.length > 0) {
+				bqNode.frequency.setValueAtTime(0, audioCtx.currentTime)
+				frequency.forEach(itm => itm.connect(bqNode.frequency))
+			} else {
+				bqNode.frequency.setValueAtTime((freqControl as LabeledInputControl).value || 350, audioCtx.currentTime)
+			}
+	
+			if (q.length > 0) {
+				bqNode.Q.setValueAtTime(0, audioCtx.currentTime)
+				q.forEach(itm => itm.connect(bqNode.Q))
+			} else {
+				bqNode.Q.setValueAtTime((qControl as LabeledInputControl).value || 1, audioCtx.currentTime)
+			}
+	
+			if (gain.length > 0) {
+				bqNode.gain.setValueAtTime(0, audioCtx.currentTime)
+				gain.forEach(itm => itm.connect(bqNode.gain))
+			} else {
+				bqNode.gain.setValueAtTime((gainControl as LabeledInputControl).value || 0, audioCtx.currentTime)
+			}
+			bqNode.type = filterType
+
+			return bqNode
 		}
 
-		if (inputs.frequency) {
-			bqNode.frequency.setValueAtTime(0, audioCtx.currentTime)
-			inputs.frequency.forEach(itm => itm.connect(bqNode.frequency))
-		} else {
-			bqNode.frequency.setValueAtTime((freqControl as LabeledInputControl).value || 350, audioCtx.currentTime)
-		}
+		const outputs: AudioNode[] = [];
 
-		if (inputs.q) {
-			bqNode.Q.setValueAtTime(0, audioCtx.currentTime)
-			inputs.q.forEach(itm => itm.connect(bqNode.Q))
-		} else {
-			bqNode.Q.setValueAtTime((qControl as LabeledInputControl).value || 1, audioCtx.currentTime)
+		for (const inSignal of signal) {
+			for (const freq of frequency) {
+				for (const q of qs) {
+					for (const g of gain) {
+						const bqNode = getBqNode(freq, q, g);
+						inSignal.forEach(itm => itm.connect(bqNode))
+						outputs.push(bqNode)
+					}
+				}
+			}
 		}
-
-		if (inputs.gain) {
-			bqNode.gain.setValueAtTime(0, audioCtx.currentTime)
-			inputs.gain.forEach(itm => itm.connect(bqNode.gain))
-		} else {
-			bqNode.gain.setValueAtTime((gainControl as LabeledInputControl).value || 0, audioCtx.currentTime)
-		}
-
-		bqNode.type = this.controls.filterType.value as BiquadFilterType
 
 		return {
-			signal: bqNode
+			signal: [outputs]
 		}
 	}
 

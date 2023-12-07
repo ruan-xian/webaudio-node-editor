@@ -19,6 +19,12 @@ const ModifierStyle = css<{ selected?: boolean }>`
   border-color: white;
 `;
 
+const BundlerStyle = css<{ selected?: boolean }>`
+background: #00000044;
+border: dotted;
+border-color: white;
+`;
+
 export function OutputNodeStyle(props: any) {
 // eslint-disable-next-line
   return <Presets.classic.Node styles={() => OutputStyle} {...props} />;
@@ -30,4 +36,8 @@ export function SourceNodeStyle(props: any) {
 export function ModifierNodeStyle(props: any) {
 // eslint-disable-next-line
   return <Presets.classic.Node styles={() => ModifierStyle} {...props} />;
+}
+export function BundlerNodeStyle(props: any) {
+  // eslint-disable-next-line
+    return <Presets.classic.Node styles={() => BundlerStyle} {...props} />;
 }

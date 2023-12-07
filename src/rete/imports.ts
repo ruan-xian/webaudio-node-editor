@@ -8,6 +8,7 @@ import { TimeDomainVisualizerNode, FrequencyDomainVisualizerNode } from './nodes
 import { EditorBiquadNode } from './nodes/EditorBiquadNode';
 import { ClipNode } from './nodes/ClipNode';
 import { NoteFrequencyNode } from "./nodes/NoteFrequencyNode";
+import { SignalBundlerNode, SignalFlattenerNode } from "./nodes/SignalBundlerNode";
 
 export async function createNode(
   { editor, area, dataflow, process }: Context,
@@ -37,6 +38,10 @@ export async function createNode(
       return new TimeDomainVisualizerNode();
     case "Frequency Domain Visualizer":
       return new FrequencyDomainVisualizerNode();
+    case "Signal Bundler":
+      return new SignalBundlerNode();
+    case "Signal Flattener":
+      return new SignalFlattenerNode();
 		default:
 			throw new Error("Unsupported node");
 	}

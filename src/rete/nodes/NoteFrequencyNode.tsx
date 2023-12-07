@@ -33,7 +33,7 @@ export class NoteFrequencyNode extends Classic.Node<{}, { value: Classic.Socket 
 		);
 	}
 
-	data(): { value: AudioNode } {
+	data(): { value: AudioNode[][] } {
 		const constantNode = audioCtx.createConstantSource();
 		const noteVal = Number(this.controls.note.value)
 		const octave = this.controls.octave.value || 0
@@ -45,7 +45,7 @@ export class NoteFrequencyNode extends Classic.Node<{}, { value: Classic.Socket 
 		audioSourceStates.push(false);
 
 		return {
-			value: constantNode
+			value: [[constantNode]]
 		}
 	}
 

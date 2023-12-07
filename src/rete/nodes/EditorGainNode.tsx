@@ -1,6 +1,7 @@
 import { ClassicPreset as Classic } from "rete"
 import { socket, audioCtx } from "../default"
 import { LabeledInputControl } from "../controls/LabeledInputControl"
+import { processBundledSignal } from "../utils"
 
 export class EditorGainNode extends Classic.Node<{ signal: Classic.Socket, baseGain: Classic.Socket, additionalGain: Classic.Socket }, { signal: Classic.Socket }, {}> {
   width = 180
@@ -22,27 +23,43 @@ export class EditorGainNode extends Classic.Node<{ signal: Classic.Socket, baseG
     this.addOutput("signal", new Classic.Output(socket, "Signal"))
   }
 
-  data(inputs: { signal?: AudioNode[], baseGain?: AudioNode[], additionalGain?: AudioNode[] }): { signal: AudioNode } {
-    const gainNode = audioCtx.createGain();
+  data(inputs: { signal?: AudioNode[][][], baseGain?: AudioNode[][][], additionalGain?: AudioNode[][][] }): { signal: AudioNode[][] } {
     const gainControl = this.inputs["baseGain"]?.control;
 
-    if (inputs.signal) {
-      inputs.signal.forEach(itm => itm.connect(gainNode));
+    const signal = processBundledSignal(inputs.signal)
+    const baseGain = processBundledSignal(inputs.baseGain)
+    const additionalGain = processBundledSignal(inputs.additionalGain)
+    const outputs: AudioNode[] = []
+
+    function getGainNode(baseGain: AudioNode[], additionalGain: AudioNode[]) {
+      const gainNode = audioCtx.createGain();
+
+      if (baseGain.length > 0) {
+        gainNode.gain.setValueAtTime(0, audioCtx.currentTime)
+        baseGain[0].connect(gainNode.gain)
+      } else {
+        gainNode.gain.setValueAtTime((gainControl as LabeledInputControl).value || 0, audioCtx.currentTime);
+      }
+
+      if (additionalGain.length > 0) {
+        additionalGain.forEach(itm => itm.connect(gainNode.gain));
+      }
+
+      return gainNode
     }
 
-    if (inputs.baseGain) {
-      gainNode.gain.setValueAtTime(0, audioCtx.currentTime)
-      inputs.baseGain[0].connect(gainNode.gain)
-    } else {
-      gainNode.gain.setValueAtTime((gainControl as LabeledInputControl).value || 0, audioCtx.currentTime);
-    }
-
-    if (inputs.additionalGain) {
-      inputs.additionalGain.forEach(itm => itm.connect(gainNode.gain));
+    for (const inSignal of signal) {
+      for (const bg of baseGain) {
+        for (const ag of additionalGain) {
+          const gainNode = getGainNode(bg, ag)
+          inSignal.forEach(itm => itm.connect(gainNode))
+          outputs.push(gainNode)
+        }
+      }
     }
 
     return {
-      signal: gainNode
+      signal: [outputs]
     }
   }
 
