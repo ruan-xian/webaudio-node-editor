@@ -37,7 +37,7 @@ import { EditorConstantNode } from './nodes/EditorConstantNode';
 import { TimeDomainVisualizerNode, FrequencyDomainVisualizerNode } from './nodes/VisualizerNodes';
 import { EditorBiquadNode } from './nodes/EditorBiquadNode';
 import { ClipNode } from './nodes/ClipNode';
-import { NoteFrequencyNode } from './nodes/NoteFrequencyNode';
+import { NoteFrequencyNode, TransposeNode } from './nodes/NoteFrequencyNode';
 
 import { BundlerNodeStyle, ModifierNodeStyle, OutputNodeStyle, SourceNodeStyle } from './styles/nodestyles';
 import { CustomConnection } from './styles/connectionstyles';
@@ -52,13 +52,14 @@ import amfmExample from './examples/amfm.json'
 import jetEngineExample from './examples/jetengine.json'
 import chordExample from './examples/chord.json'
 import { CustomContextMenu } from './styles/contextstyles';
-import { BundleDebuggerNode, SignalBundlerNode, SignalFlattenerNode } from './nodes/SignalBundlerNode';
+import { BundleDebuggerNode, BundleExtenderNode, SignalBundlerNode, SignalFlattenerNode } from './nodes/SignalBundlerNode';
+import { ConsoleDebuggerNode } from './nodes/ConsoleDebuggerNode';
 
 const examples: { [key in string]: any } = {
-  "Babbling Brook (HW3)": {json: brookExample, concepts: "Filters, noise, signal addition"},
-  "AM+FM Synthesis": {json: amfmExample, concepts: "Synthesis, addition to base values"},
-  "Jet Engine": {json: jetEngineExample, concepts: "Multiparameter control with one constant node"},
-  "Chord": {json: chordExample, concepts: "Signal bundling, note frequency node"}
+  "Babbling Brook (HW3)": { json: brookExample, concepts: "Filters, noise, signal addition" },
+  "AM+FM Synthesis": { json: amfmExample, concepts: "Synthesis, addition to base values" },
+  "Jet Engine": { json: jetEngineExample, concepts: "Multiparameter control with one constant node, intermediate debugging with visualizer outputs" },
+  "Chord": { json: chordExample, concepts: "Signal bundling, note frequency node, transpose node" }
 }
 
 type SourceNode =
@@ -73,23 +74,26 @@ type ModifierNode =
   | EditorGainNode
   | EditorBiquadNode
   | ClipNode
+  | TransposeNode
 
-const modifierNodeTypes = [EditorGainNode, EditorBiquadNode, ClipNode]
+const modifierNodeTypes = [EditorGainNode, EditorBiquadNode, ClipNode, TransposeNode]
 
 type OutputNode =
   | UniversalOutputNode
   | AudioOutputNode
   | TimeDomainVisualizerNode
   | FrequencyDomainVisualizerNode
+  | ConsoleDebuggerNode
 
-const outputNodeTypes = [UniversalOutputNode, AudioOutputNode, TimeDomainVisualizerNode, FrequencyDomainVisualizerNode]
+const outputNodeTypes = [UniversalOutputNode, AudioOutputNode, TimeDomainVisualizerNode, FrequencyDomainVisualizerNode, ConsoleDebuggerNode]
 
 type BundlerNode =
   | SignalBundlerNode
   | SignalFlattenerNode
   | BundleDebuggerNode
+  | BundleExtenderNode
 
-const bundlerNodeTypes = [SignalBundlerNode, SignalFlattenerNode, BundleDebuggerNode]
+const bundlerNodeTypes = [SignalBundlerNode, SignalFlattenerNode, BundleDebuggerNode, BundleExtenderNode]
 
 type Node =
   | SourceNode
@@ -151,25 +155,29 @@ function killOscillators() {
   audioSourceStates.length = 0
 }
 
-
+var processQueued = false
 
 export async function createEditor(container: HTMLElement) {
 
   const area = new AreaPlugin<Schemes, AreaExtra>(container);
   const editor = new NodeEditor<Schemes>();
   const engine = new DataflowEngine<Schemes>();
-  
+
   function process() {
+    if (processQueued) return;
+    processQueued = true;
     engine.reset();
-  
+
     killOscillators();
-  
-    editor
-      .getNodes()
-      .filter((n) => outputNodeTypes.some(itm => n instanceof itm) || n instanceof BundleDebuggerNode)
-      .forEach((n) => engine.fetch(n.id));
-  
-    setTimeout(reInitOscillators, 100);
+
+    setTimeout(() => {
+      editor
+        .getNodes()
+        .filter((n) => outputNodeTypes.some(itm => n instanceof itm) || bundlerNodeTypes.some(itm => n instanceof itm))
+        .forEach((n) => engine.fetch(n.id));
+      setTimeout(reInitOscillators, 100);
+      setTimeout(() => processQueued = false, 150);
+    }, 50)
   }
 
   const connection = new ConnectionPlugin<Schemes, AreaExtra>();
@@ -189,6 +197,7 @@ export async function createEditor(container: HTMLElement) {
     items: ContextMenuPresets.classic.setup([
       ["Constant", () => new EditorConstantNode(process)],
       ["Note Frequency", () => new NoteFrequencyNode(process)],
+      ["Transpose", () => new TransposeNode(process)],
       ["Oscillator", () => new EditorOscillatorNode(process)],
       ["Gain", () => new EditorGainNode(process)],
       ["Biquad Filter", () => new EditorBiquadNode(process)],
@@ -198,11 +207,13 @@ export async function createEditor(container: HTMLElement) {
         [["Universal Output", () => new UniversalOutputNode(process)],
         ["Audio Output", () => new AudioOutputNode(process)],
         ["Time Domain Visualizer", () => new TimeDomainVisualizerNode()],
-        ["Frequency Domain Visualizer", () => new FrequencyDomainVisualizerNode()]]],
+        ["Frequency Domain Visualizer", () => new FrequencyDomainVisualizerNode()],
+        ["Console Debugger", () => new ConsoleDebuggerNode()]]],
       ["Signal Bundling",
         [["Signal Bundler", () => new SignalBundlerNode((c) => area.update("control", c.id))],
         ["Signal Flattener", () => new SignalFlattenerNode()],
-      ["Bundle Debugger", () => new BundleDebuggerNode((c) => area.update("control", c.id))]]]
+        ["Bundle Extender", () => new BundleExtenderNode((c) => area.update("control", c.id))],
+        ["Bundle Debugger", () => new BundleDebuggerNode((c) => area.update("control", c.id))]]]
     ])
   });
 

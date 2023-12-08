@@ -7,8 +7,9 @@ import { EditorConstantNode } from './nodes/EditorConstantNode';
 import { TimeDomainVisualizerNode, FrequencyDomainVisualizerNode } from './nodes/VisualizerNodes';
 import { EditorBiquadNode } from './nodes/EditorBiquadNode';
 import { ClipNode } from './nodes/ClipNode';
-import { NoteFrequencyNode } from "./nodes/NoteFrequencyNode";
-import { SignalBundlerNode, SignalFlattenerNode, BundleDebuggerNode } from "./nodes/SignalBundlerNode";
+import { NoteFrequencyNode, TransposeNode } from "./nodes/NoteFrequencyNode";
+import { SignalBundlerNode, SignalFlattenerNode, BundleDebuggerNode, BundleExtenderNode } from "./nodes/SignalBundlerNode";
+import { ConsoleDebuggerNode } from "./nodes/ConsoleDebuggerNode";
 
 export async function createNode(
   { editor, area, dataflow, process }: Context,
@@ -34,16 +35,22 @@ export async function createNode(
 			return new EditorOscillatorNode(process, data);
     case "Note Frequency":
       return new NoteFrequencyNode(process, data);
+    case "Transpose":
+      return new TransposeNode(process, data);
     case "Time Domain Visualizer":
       return new TimeDomainVisualizerNode();
     case "Frequency Domain Visualizer":
       return new FrequencyDomainVisualizerNode();
+    case "Console Debugger":
+      return new ConsoleDebuggerNode();
     case "Signal Bundler":
       return new SignalBundlerNode((c) => area.update("control", c.id));
     case "Signal Flattener":
       return new SignalFlattenerNode();
     case "Bundle Debugger":
       return new BundleDebuggerNode((c) => area.update("control", c.id));
+    case "Bundle Extender":
+      return new BundleExtenderNode((c) => area.update("control", c.id));
 		default:
 			throw new Error("Unsupported node");
 	}
