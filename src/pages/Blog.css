@@ -1,0 +1,27 @@
+.Blog-Header {
+	color: white;
+	font-size: 32px;
+	margin: 10px
+}
+
+.Blog-content {
+	color: white;
+	font-size: 18px;
+	margin: 5px 10px
+}
+
+.Blog-link, .Blog-link:hover, .Blog-link:visited, .Blog-link:focus {
+	color:pink;
+	text-decoration: underline;
+	text-decoration-color: pink;
+}
+
+.Blog-link:visited {
+	color:lightgray;
+	text-decoration-color: lightgray;
+}
+
+.Blog-link:hover {
+	color:white;
+	text-decoration-color: white;
+}

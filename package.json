@@ -17,6 +17,7 @@
     "antd": "^5.11.5",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-router-dom": "^6.20.1",
     "react-scripts": "^5.0.1",
     "rete": "^2.0.2",
     "rete-area-3d-plugin": "^2.0.3",

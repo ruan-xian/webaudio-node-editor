@@ -47,6 +47,7 @@ import { importEditor, exportEditor } from './imports';
 import { clearEditor } from './utils';
 import { CustomSocket } from './styles/socketstyles';
 
+import defaultExample from './examples/default.json'
 import brookExample from './examples/brook.json';
 import amfmExample from './examples/amfm.json'
 import jetEngineExample from './examples/jetengine.json'
@@ -58,11 +59,12 @@ import { ConsoleDebuggerNode } from './nodes/ConsoleDebuggerNode';
 import { KeyboardNoteNode, initKeyboard, initKeyboardHandlers } from './nodes/KeyboardOscillatorNode';
 
 const examples: { [key in string]: any } = {
+  "Default": { json: defaultExample, concepts: "Drag from socket to socket to create connections; right click for context menu" },
   "Babbling Brook (HW3)": { json: brookExample, concepts: "Filters, noise, signal addition" },
   "AM+FM Synthesis": { json: amfmExample, concepts: "Synthesis, addition to base values" },
   "Jet Engine": { json: jetEngineExample, concepts: "Multiparameter control with one constant node, intermediate debugging with visualizer outputs" },
   "Chord": { json: chordExample, concepts: "Signal bundling, note frequency node, transpose node" },
-  "Lo-fi Synth": { json: lofiSynthExample, concepts: "Keyboard input, ADSR, signal bundling"}
+  "Lo-fi Synth": { json: lofiSynthExample, concepts: "Keyboard input (try pressing some keyboard keys!), ADSR, signal bundling" }
 }
 
 type SourceNode =
@@ -81,7 +83,7 @@ type ModifierNode =
 
 const modifierNodeTypes = [EditorGainNode, EditorBiquadNode, ClipNode, TransposeNode]
 
-type InputNode = 
+type InputNode =
   | KeyboardNoteNode
 
 const inputNodeTypes = [KeyboardNoteNode]
@@ -206,15 +208,16 @@ export async function createEditor(container: HTMLElement) {
   const contextMenu = new ContextMenuPlugin<Schemes>({
     items: ContextMenuPresets.classic.setup([
       ["Constant", () => new EditorConstantNode(process)],
-      ["Note Frequency", () => new NoteFrequencyNode(process)],
-      ["Transpose", () => new TransposeNode(process)],
       ["Oscillator", () => new EditorOscillatorNode(process)],
-      ["Gain", () => new EditorGainNode(process)],
-      ["Biquad Filter", () => new EditorBiquadNode(process)],
-      ["Clip", () => new ClipNode(process)],
       ["Noise", () => new EditorNoiseNode(process, { noiseType: "White Noise" })],
-      ["Inputs",
-        [["Keyboard Oscillator", () => new KeyboardNoteNode(process)]]],
+      ["Processors", [
+        ["Gain", () => new EditorGainNode(process)],
+        ["Biquad Filter", () => new EditorBiquadNode(process)],
+        ["Clip", () => new ClipNode(process)]]],
+      ["Notes",
+        [["Keyboard Oscillator", () => new KeyboardNoteNode(process)],
+        ["Note Frequency", () => new NoteFrequencyNode(process)],
+        ["Transpose", () => new TransposeNode(process)]]],
       ["Outputs",
         [["Universal Output", () => new UniversalOutputNode(process)],
         ["Audio Output", () => new AudioOutputNode(process)],
