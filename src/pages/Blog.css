@@ -1,7 +1,13 @@
-.Blog-Header {
+.Blog-header {
 	color: white;
 	font-size: 32px;
 	margin: 10px
+}
+
+.Blog-subheader {
+	color: white;
+	font-size: 26px;
+	margin: 5px 10px
 }
 
 .Blog-content {

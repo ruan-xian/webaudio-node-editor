@@ -412,7 +412,7 @@ export async function createEditor(container: HTMLElement) {
     exportEditorToFile,
     importEditorFromFile,
     clearEditor: () => clearEditor(editor),
-    destroy: () => area.destroy(),
+    destroy: () => {killOscillators(); initKeyboard(); area.destroy()},
     getExamples() { return Object.keys(examples) },
     loadExample,
     toggleAudio,

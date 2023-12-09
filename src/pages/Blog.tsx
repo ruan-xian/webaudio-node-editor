@@ -17,7 +17,7 @@ export default function Blog() {
 					<div style={{ flexGrow: 1 }} />
 				</Flex>
 				<Layout style={{ display: 'flex', width: '75%', overflow: "auto", margin: 'auto', backgroundColor: 'rgba(0,0,0,0.2)', padding: '0em 2em' }}>
-					<div className="Blog-Header">What is this?</div>
+					<div className="Blog-header">What is this?</div>
 					<div className="Blog-content">This is a node-based editor for WebAudio
 						created using <a className="Blog-link" href="https://retejs.org/" target="_blank" rel="noreferrer">Rete.js</a>,
 						a Javascript framework for visual programming through node editors. Node editors are widely used
@@ -25,7 +25,7 @@ export default function Blog() {
 						node editors for Blender and other software, I wanted to
 						take a stab at making my own node editor for WebAudio, since I found that I having something
 						like this while working on the homework for this class.</div>
-					<div className="Blog-Header">Implementation</div>
+					<div className="Blog-header">Implementation</div>
 					<div className="Blog-content">
 						The nice thing about this project is that WebAudio already naturally lends itself to a node-based
 						approach. Since the underlying structure of WebAudio is already based on nodes and connections,
@@ -48,7 +48,7 @@ export default function Blog() {
 						Generally, most of my nodes simply create their corresponding AudioNode and connect() their
 						inputs accordingly, and return the new node as the signal to be sent to the next node.
 					</div>
-					<div className="Blog-Header">Design Choices</div>
+					<div className="Blog-header">Design Choices</div>
 					<div className="Blog-content">
 						One early design decision was to have "base frequency/gain" and "additional frequency/gain"
 						inputs on the oscillator and gain nodes. These fields are normally just one parameter on their
@@ -70,20 +70,22 @@ export default function Blog() {
 					</div>
 					<div className="Blog-content">
 						In short, a bundled signal allows many more nodes to be created from a single series of
-						connections than usual. (See the documentation for how this works!) Bundling turned out
+						connections than usual. (See 
+						the <Link to="/documentation" className="Blog-link">documentation</Link> for 
+						how this works!) Bundling turned out
 						to add a great deal of complexity to the project, since inputs turned from single-dimensional
 						arrays into three-dimensional arrays, and Cartesian products got involved down the line, but
 						they added a lot of capacity for compactness in the node graph, and I'm happy with
 						how it turned out.
 					</div>
 					<div className="Blog-content">
-						Keyboard-playable notes were the last feature I added, and I'm honestly not entirely happy
-						with how they turned out. They're functional, but not as flexible as I would've wanted.
+						Keyboard-playable notes were the last feature I added, and I'm honestly not entirely satisfied
+						with the final implementation. They're functional, but not as flexible as I would've wanted.
 						Ideally, I would have the ADSR envelope as its own node, separate from the oscillators
 						and their frequencies, but I just couldn't figure out a flexible enough way to have these
 						elements link together properly, so instead I opted for a mega node. It... works I guess?
 					</div>
-					<div className="Blog-Header">Limitations and Future Steps</div>
+					<div className="Blog-header">Limitations and Future Steps</div>
 					<div className="Blog-content">
 						- Some clipping prevention is included through a DynamicsCompressorNode, but it's not always enough
 					</div>
@@ -105,7 +107,7 @@ export default function Blog() {
 						- I'm bad at web development and this is my first project that isn't
 						just vanilla HTML/CSS/JS, so I'm sure there's bad code practices in here
 					</div>
-					<div className="Blog-Header">Thanks for checking this out!</div>
+					<div className="Blog-header">Thanks for checking this out!</div>
 					<div className="Blog-content">
 						&nbsp;&nbsp;&nbsp;&nbsp; - Ryan
 					</div>
