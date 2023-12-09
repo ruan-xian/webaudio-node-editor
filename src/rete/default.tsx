@@ -39,8 +39,8 @@ import { EditorBiquadNode } from './nodes/EditorBiquadNode';
 import { ClipNode } from './nodes/ClipNode';
 import { NoteFrequencyNode, TransposeNode } from './nodes/NoteFrequencyNode';
 
-import { BundlerNodeStyle, ModifierNodeStyle, OutputNodeStyle, SourceNodeStyle } from './styles/nodestyles';
-import { CustomConnection } from './styles/connectionstyles';
+import { BundlerNodeStyle, InputNodeStyle, ModifierNodeStyle, OutputNodeStyle, SourceNodeStyle } from './styles/nodestyles';
+import { DashedConnection } from './styles/connectionstyles';
 import { SmoothZoom } from './smoothzoom';
 
 import { importEditor, exportEditor } from './imports';
@@ -51,15 +51,18 @@ import brookExample from './examples/brook.json';
 import amfmExample from './examples/amfm.json'
 import jetEngineExample from './examples/jetengine.json'
 import chordExample from './examples/chord.json'
+import lofiSynthExample from './examples/lofisynth.json'
 import { CustomContextMenu } from './styles/contextstyles';
 import { BundleDebuggerNode, BundleExtenderNode, SignalBundlerNode, SignalFlattenerNode } from './nodes/SignalBundlerNode';
 import { ConsoleDebuggerNode } from './nodes/ConsoleDebuggerNode';
+import { KeyboardNoteNode, initKeyboard, initKeyboardHandlers } from './nodes/KeyboardOscillatorNode';
 
 const examples: { [key in string]: any } = {
   "Babbling Brook (HW3)": { json: brookExample, concepts: "Filters, noise, signal addition" },
   "AM+FM Synthesis": { json: amfmExample, concepts: "Synthesis, addition to base values" },
   "Jet Engine": { json: jetEngineExample, concepts: "Multiparameter control with one constant node, intermediate debugging with visualizer outputs" },
-  "Chord": { json: chordExample, concepts: "Signal bundling, note frequency node, transpose node" }
+  "Chord": { json: chordExample, concepts: "Signal bundling, note frequency node, transpose node" },
+  "Lo-fi Synth": { json: lofiSynthExample, concepts: "Keyboard input, ADSR, signal bundling"}
 }
 
 type SourceNode =
@@ -77,6 +80,11 @@ type ModifierNode =
   | TransposeNode
 
 const modifierNodeTypes = [EditorGainNode, EditorBiquadNode, ClipNode, TransposeNode]
+
+type InputNode = 
+  | KeyboardNoteNode
+
+const inputNodeTypes = [KeyboardNoteNode]
 
 type OutputNode =
   | UniversalOutputNode
@@ -98,6 +106,7 @@ const bundlerNodeTypes = [SignalBundlerNode, SignalFlattenerNode, BundleDebugger
 type Node =
   | SourceNode
   | ModifierNode
+  | InputNode
   | OutputNode
   | BundlerNode;
 
@@ -169,6 +178,7 @@ export async function createEditor(container: HTMLElement) {
     engine.reset();
 
     killOscillators();
+    initKeyboard();
 
     setTimeout(() => {
       editor
@@ -203,6 +213,8 @@ export async function createEditor(container: HTMLElement) {
       ["Biquad Filter", () => new EditorBiquadNode(process)],
       ["Clip", () => new ClipNode(process)],
       ["Noise", () => new EditorNoiseNode(process, { noiseType: "White Noise" })],
+      ["Inputs",
+        [["Keyboard Oscillator", () => new KeyboardNoteNode(process)]]],
       ["Outputs",
         [["Universal Output", () => new UniversalOutputNode(process)],
         ["Audio Output", () => new AudioOutputNode(process)],
@@ -262,6 +274,9 @@ export async function createEditor(container: HTMLElement) {
         return null;
       },
       node(context) {
+        if (inputNodeTypes.some((c) => context.payload instanceof c)) {
+          return InputNodeStyle;
+        }
         if (outputNodeTypes.some((c) => context.payload instanceof c)) {
           return OutputNodeStyle;
         }
@@ -280,7 +295,7 @@ export async function createEditor(container: HTMLElement) {
         return null;
       },
       connection(context) {
-        return CustomConnection;
+        return DashedConnection;
       },
       socket(context) {
         return CustomSocket;
@@ -288,6 +303,8 @@ export async function createEditor(container: HTMLElement) {
     }
   }));
   reactRender.addPreset(Presets.contextMenu.setup({ customize: CustomContextMenu, delay: 200 }));
+
+  initKeyboardHandlers();
 
   const osc = new EditorOscillatorNode(process);
   const gain = new EditorGainNode(process, { gain: 0.5 });

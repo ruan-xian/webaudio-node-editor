@@ -10,6 +10,7 @@ import { ClipNode } from './nodes/ClipNode';
 import { NoteFrequencyNode, TransposeNode } from "./nodes/NoteFrequencyNode";
 import { SignalBundlerNode, SignalFlattenerNode, BundleDebuggerNode, BundleExtenderNode } from "./nodes/SignalBundlerNode";
 import { ConsoleDebuggerNode } from "./nodes/ConsoleDebuggerNode";
+import { KeyboardNoteNode } from "./nodes/KeyboardOscillatorNode";
 
 export async function createNode(
   { editor, area, dataflow, process }: Context,
@@ -51,6 +52,8 @@ export async function createNode(
       return new BundleDebuggerNode((c) => area.update("control", c.id));
     case "Bundle Extender":
       return new BundleExtenderNode((c) => area.update("control", c.id));
+    case "Keyboard Note":
+      return new KeyboardNoteNode(process, data);
 		default:
 			throw new Error("Unsupported node");
 	}

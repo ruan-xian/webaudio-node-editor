@@ -12,7 +12,7 @@ const Svg = styled.svg`
   height: 9999px;
 `;
 
-const Path = styled.path<{ styles?: (props: any) => any }>`
+const DashedPath = styled.path<{ styles?: (props: any) => any }>`
   fill: none;
   stroke-width: 6px;
   stroke: rgba(255,255,255,1);
@@ -21,7 +21,15 @@ const Path = styled.path<{ styles?: (props: any) => any }>`
   ${(props) => props.styles && props.styles(props)}
 `;
 
-export function CustomConnection(props: {
+const SolidPath = styled.path<{ styles?: (props: any) => any }>`
+  fill: none;
+  stroke-width: 6px;
+  stroke: rgba(255,255,255,1);
+  pointer-events: auto;
+  ${(props) => props.styles && props.styles(props)}
+`;
+
+export function DashedConnection(props: {
   data: ClassicScheme["Connection"] & { isLoop?: boolean };
   styles?: () => any;
 }) {
@@ -31,7 +39,22 @@ export function CustomConnection(props: {
 
   return (
     <Svg data-testid="connection">
-      <Path styles={props.styles} d={path} />
+      <DashedPath styles={props.styles} d={path} />
+    </Svg>
+  );
+}
+
+export function SolidConnection(props: {
+  data: ClassicScheme["Connection"] & { isLoop?: boolean };
+  styles?: () => any;
+}) {
+  const { path } = useConnection();
+
+  if (!path) return null;
+
+  return (
+    <Svg data-testid="connection">
+      <SolidPath styles={props.styles} d={path} />
     </Svg>
   );
 }

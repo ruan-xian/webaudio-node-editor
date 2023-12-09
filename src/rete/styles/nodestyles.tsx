@@ -1,6 +1,12 @@
 import { Presets } from "rete-react-plugin";
 import { css } from "styled-components";
 
+const InputStyle = css<{ selected?: boolean }>`
+background: #00000044;
+border: double;
+border-color: white;
+`;
+
 const OutputStyle = css<{ selected?: boolean }>`
   background: #00000055;
   border: none;
@@ -25,6 +31,10 @@ border: dotted;
 border-color: white;
 `;
 
+export function InputNodeStyle(props: any) {
+  // eslint-disable-next-line
+    return <Presets.classic.Node styles={() => InputStyle} {...props} />;
+  }
 export function OutputNodeStyle(props: any) {
 // eslint-disable-next-line
   return <Presets.classic.Node styles={() => OutputStyle} {...props} />;
