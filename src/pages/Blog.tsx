@@ -23,7 +23,7 @@ export default function Blog() {
 						a Javascript framework for visual programming through node editors. Node editors are widely used
 						in shader editors and even game programming (as in Unreal Engine's Blueprints). Having used
 						node editors for Blender and other software, I wanted to
-						take a stab at making my own node editor for WebAudio, since I found that I having something
+						take a stab at making my own node editor for WebAudio, since I found that I really missed having something
 						like this while working on the homework for this class.</div>
 					<div className="Blog-header">Implementation</div>
 					<div className="Blog-content">

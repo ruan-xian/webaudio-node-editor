@@ -44,13 +44,15 @@ export function CustomVisualizerOutput(props: { data: VisualizerControl }) {
             var y = (v * canvas.height) / 2;
             if (i === 0) {
               canvasCtx.moveTo(x, y);
+            } else if (i === bufferLength - 1) {
+              canvasCtx.lineTo(x, y);
+              canvasCtx.lineTo(canvas.width, y);
             } else {
               canvasCtx.lineTo(x, y);
             }
             x += sliceWidth;
           }
       
-          canvasCtx.lineTo(canvas.width, canvas.height / 2);
           canvasCtx.stroke();
         } else {
           // based on code from https://www.telerik.com/blogs/adding-audio-visualization-react-app-using-web-audio-api

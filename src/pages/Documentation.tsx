@@ -112,10 +112,11 @@ export default function Documentation() {
 					</div>
 					<div className="Blog-content">
 						Things are more complicated when a node receives multiple bundled signals.
-						If a node receives bundled signals in different sockets, the output will be the Cartesian products.
-						That is, if a gain node receives a 3-wide bundled signal of constants [1,5,7] in its signal field
-						and a 2-wide bundled signal of constants [2, 3] in its gain field, the output will be a 6-wide
-						bundled signal consisting of [1*2 = 2, 1*3 = 3, 5*2 = 10, 5*3 = 15, 7*2 = 14, 7*3 = 21].
+						If a node receives bundled signals in different sockets, the inputs will be treated as the Cartesian products.
+						That is, if an oscillator node receives a 3-wide bundled signal of constants [100, 500, 700] in its base frequency field
+						and a 2-wide bundled signal of constants [1, 2] in its additional frequency field, the output will be a 6-wide
+						bundled signal consisting of six oscillators with 
+						frequencies [101, 102, 501, 502, 701, 702].
 					</div>
 					<div className="Blog-content">
 						If, for whatever reason, you decide to pass in multiple bundled signals to one socket, the socket's
@@ -139,7 +140,7 @@ export default function Documentation() {
 					</div>
 					<div className="Blog-content">
 						This is the only non-output node for which passing in multiple bundled signals does not take the Cartesian product. Instead, the bundles are
-						"flattened" and combined into a new bundle. For example, the inputs [[a,b],[c],[d,e]] will produce a single output bundle [a,b,c,d,e].
+						"flattened" and combined into a new bundle. For example, the inputs [a,b], [c], and [d,e] will produce a single output bundle [a,b,c,d,e].
 					</div>
 					<div className="Blog-subheader">Bundle Flattener</div>
 					<div className="Blog-content">

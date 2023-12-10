@@ -59,7 +59,7 @@ import { ConsoleDebuggerNode } from './nodes/ConsoleDebuggerNode';
 import { KeyboardNoteNode, initKeyboard, initKeyboardHandlers } from './nodes/KeyboardOscillatorNode';
 
 const examples: { [key in string]: any } = {
-  "Default": { json: defaultExample, concepts: "Drag from socket to socket to create connections; right click for context menu" },
+  "Default": { json: defaultExample, concepts: "Drag from socket to socket to create connections; right click for context menu. Try loading some examples to the left of this!" },
   "Babbling Brook (HW3)": { json: brookExample, concepts: "Filters, noise, signal addition" },
   "AM+FM Synthesis": { json: amfmExample, concepts: "Synthesis, addition to base values" },
   "Jet Engine": { json: jetEngineExample, concepts: "Multiparameter control with one constant node, intermediate debugging with visualizer outputs" },
