@@ -41,7 +41,7 @@ export class EditorBiquadNode extends Classic.Node<{ signal: Classic.Socket, fre
 		this.addControl("filterType", new DropdownControl(change, dropdownOptions, initial ? initial.filterType : "lowpass"))
 	}
 
-	data(inputs: { signal?: AudioNode[][][], frequency?: AudioNode[][][], q?: AudioNode[][][], gain?: AudioNode[][][] }): { signal: AudioNode[][] } {
+	data(inputs: { signal?: AudioNode[][], frequency?: AudioNode[][], q?: AudioNode[][], gain?: AudioNode[][] }): { signal: AudioNode[] } {
 
 		const freqControl = this.inputs.frequency?.control;
 		const qControl = this.inputs.q?.control;
@@ -96,7 +96,7 @@ export class EditorBiquadNode extends Classic.Node<{ signal: Classic.Socket, fre
 		}
 
 		return {
-			signal: [outputs]
+			signal: outputs
 		}
 	}
 

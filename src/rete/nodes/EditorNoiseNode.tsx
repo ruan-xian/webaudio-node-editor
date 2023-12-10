@@ -15,7 +15,7 @@ export class EditorNoiseNode extends Classic.Node<{}, { signal: Classic.Socket }
     this.addOutput("signal", new Classic.Output(socket, "Signal"))
   }
 
-  data(): { signal: AudioNode[][] } {
+  data(): { signal: AudioNode[] } {
     const noiseSource = audioCtx.createBufferSource();
     var bufferSize = 10 * audioCtx.sampleRate;
     var noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
@@ -42,7 +42,7 @@ export class EditorNoiseNode extends Classic.Node<{}, { signal: Classic.Socket }
     audioSourceStates.push(false);
 
     return {
-      signal: [[noiseSource]]
+      signal: [noiseSource]
     }
   }
 

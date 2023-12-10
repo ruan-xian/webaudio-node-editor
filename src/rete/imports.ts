@@ -8,7 +8,7 @@ import { TimeDomainVisualizerNode, FrequencyDomainVisualizerNode } from './nodes
 import { EditorBiquadNode } from './nodes/EditorBiquadNode';
 import { ClipNode } from './nodes/ClipNode';
 import { NoteFrequencyNode, TransposeNode } from "./nodes/NoteFrequencyNode";
-import { SignalBundlerNode, SignalFlattenerNode, BundleDebuggerNode, BundleExtenderNode } from "./nodes/SignalBundlerNode";
+import { SignalBundlerNode, SignalFlattenerNode, BundleDebuggerNode } from "./nodes/SignalBundlerNode";
 import { ConsoleDebuggerNode } from "./nodes/ConsoleDebuggerNode";
 import { KeyboardNoteNode } from "./nodes/KeyboardOscillatorNode";
 
@@ -50,8 +50,6 @@ export async function createNode(
       return new SignalFlattenerNode();
     case "Bundle Debugger":
       return new BundleDebuggerNode((c) => area.update("control", c.id));
-    case "Bundle Extender":
-      return new BundleExtenderNode((c) => area.update("control", c.id));
     case "Keyboard Note":
       return new KeyboardNoteNode(process, data);
 		default:

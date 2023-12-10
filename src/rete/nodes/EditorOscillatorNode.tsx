@@ -29,7 +29,7 @@ export class EditorOscillatorNode extends Classic.Node<{ baseFrequency: Classic.
 		this.addControl("waveform", new DropdownControl(change, dropdownOptions, initial ? initial.waveform : undefined))
 	}
 
-	data(inputs: { baseFrequency?: AudioNode[][][], frequency?: AudioNode[][][] }): { signal: AudioNode[][] } {
+	data(inputs: { baseFrequency?: AudioNode[][], frequency?: AudioNode[][] }): { signal: AudioNode[] } {
 		const bfreqControl = this.inputs["baseFrequency"]?.control;
 		const baseFrequency = processBundledSignal(inputs.baseFrequency)
 		const frequency = processBundledSignal(inputs.frequency)
@@ -65,7 +65,7 @@ export class EditorOscillatorNode extends Classic.Node<{ baseFrequency: Classic.
 			}
 		}
 		return {
-			signal: [outputs]
+			signal: outputs
 		}
 	}
 

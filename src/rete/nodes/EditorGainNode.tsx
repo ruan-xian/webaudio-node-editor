@@ -23,7 +23,7 @@ export class EditorGainNode extends Classic.Node<{ signal: Classic.Socket, baseG
     this.addOutput("signal", new Classic.Output(socket, "Signal"))
   }
 
-  data(inputs: { signal?: AudioNode[][][], baseGain?: AudioNode[][][], additionalGain?: AudioNode[][][] }): { signal: AudioNode[][] } {
+  data(inputs: { signal?: AudioNode[][], baseGain?: AudioNode[][], additionalGain?: AudioNode[][] }): { signal: AudioNode[] } {
     const gainControl = this.inputs["baseGain"]?.control;
 
     const signal = processBundledSignal(inputs.signal)
@@ -59,7 +59,7 @@ export class EditorGainNode extends Classic.Node<{ signal: Classic.Socket, baseG
     }
 
     return {
-      signal: [outputs]
+      signal: outputs
     }
   }
 

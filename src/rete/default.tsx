@@ -54,7 +54,7 @@ import jetEngineExample from './examples/jetengine.json'
 import chordExample from './examples/chord.json'
 import lofiSynthExample from './examples/lofisynth.json'
 import { CustomContextMenu } from './styles/contextstyles';
-import { BundleDebuggerNode, BundleExtenderNode, SignalBundlerNode, SignalFlattenerNode } from './nodes/SignalBundlerNode';
+import { BundleDebuggerNode, SignalBundlerNode, SignalFlattenerNode } from './nodes/SignalBundlerNode';
 import { ConsoleDebuggerNode } from './nodes/ConsoleDebuggerNode';
 import { KeyboardNoteNode, initKeyboard, initKeyboardHandlers } from './nodes/KeyboardOscillatorNode';
 
@@ -64,7 +64,7 @@ const examples: { [key in string]: any } = {
   "AM+FM Synthesis": { json: amfmExample, concepts: "Synthesis, addition to base values" },
   "Jet Engine": { json: jetEngineExample, concepts: "Multiparameter control with one constant node, intermediate debugging with visualizer outputs" },
   "Chord": { json: chordExample, concepts: "Signal bundling, note frequency node, transpose node" },
-  "Lo-fi Synth": { json: lofiSynthExample, concepts: "Keyboard input (try pressing some keyboard keys!), ADSR, signal bundling" }
+  "Lo-fi Synth": { json: lofiSynthExample, concepts: "Try pressing keyboard keys. Shift key acts as a sustain pedal." }
 }
 
 type SourceNode =
@@ -101,9 +101,8 @@ type BundlerNode =
   | SignalBundlerNode
   | SignalFlattenerNode
   | BundleDebuggerNode
-  | BundleExtenderNode
 
-const bundlerNodeTypes = [SignalBundlerNode, SignalFlattenerNode, BundleDebuggerNode, BundleExtenderNode]
+const bundlerNodeTypes = [SignalBundlerNode, SignalFlattenerNode, BundleDebuggerNode]
 
 type Node =
   | SourceNode
@@ -227,7 +226,6 @@ export async function createEditor(container: HTMLElement) {
       ["Signal Bundling",
         [["Signal Bundler", () => new SignalBundlerNode((c) => area.update("control", c.id))],
         ["Signal Flattener", () => new SignalFlattenerNode()],
-        ["Bundle Extender", () => new BundleExtenderNode((c) => area.update("control", c.id))],
         ["Bundle Debugger", () => new BundleDebuggerNode((c) => area.update("control", c.id))]]]
     ])
   });

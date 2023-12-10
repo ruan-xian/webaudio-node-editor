@@ -152,7 +152,7 @@ export class KeyboardNoteNode extends Classic.Node<{additionalFrequency: Classic
 		this.addControl("releaseLength", new LabeledInputControl(initial ? initial.adsrProfile.releaseLength : 1, "Release Length", change))
 	}
 
-	data(inputs: {additionalFrequency: AudioNode[][][]}): { signal: AudioNode[][] } {
+	data(inputs: {additionalFrequency: AudioNode[][]}): { signal: AudioNode[] } {
 		const frequency = processBundledSignal(inputs.additionalFrequency)
 		const oscType = this.controls.waveform.value?.toString() as OscillatorType || "sine"
 		const halfstep = this.controls.halfstep.value || 0;
@@ -194,7 +194,7 @@ export class KeyboardNoteNode extends Classic.Node<{additionalFrequency: Classic
 			}
 		)
 		return {
-			signal: [outputs]
+			signal: outputs
 		}
 	}
 

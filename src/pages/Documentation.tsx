@@ -97,20 +97,89 @@ export default function Documentation() {
 						it should be noted that there is <i>nothing</i> you can do with signal bundling that you
 						can't do without it. It would just take more nodes to do so and be messier.
 					</div>
+					<div className="Blog-content">
+						See the Chord example to see how signal bundling can be used. Note how with the use of
+						5 frequencies and 4 gain values, we can produce 20 notes with a single oscillator node (in the
+						node editor). I have found that this is the most commonly applicable use case of signal bundling.
+					</div>
 					<div className="Blog-subheader">So what does it do?</div>
 					<div className="Blog-content">
-						When a node receives a bundled signal of width <i>n</i>, it treats it as if <i>n</i>
-						separate nodes each received one of the signals. For example, let our bundled signal
+						When a node receives a bundled signal of width <i>n</i>, it treats it as if <i>n</i> separate
+						nodes each received one of the signals. For example, let our bundled signal
 						of width 3 be the constant signals [100, 200, 300]. When we feed this bundled signal
 						into an oscillator node's base frequency field, the output will be a 3-wide bundled signal of
 						3 oscillators, with frequencies 100, 200, and 300.
 					</div>
 					<div className="Blog-content">
 						Things are more complicated when a node receives multiple bundled signals.
-						If a node receives bundled signals in different sockets, the output will be the cartesian products.
+						If a node receives bundled signals in different sockets, the output will be the Cartesian products.
 						That is, if a gain node receives a 3-wide bundled signal of constants [1,5,7] in its signal field
 						and a 2-wide bundled signal of constants [2, 3] in its gain field, the output will be a 6-wide
 						bundled signal consisting of [1*2 = 2, 1*3 = 3, 5*2 = 10, 5*3 = 15, 7*2 = 14, 7*3 = 21].
+					</div>
+					<div className="Blog-content">
+						If, for whatever reason, you decide to pass in multiple bundled signals to one socket, the socket's
+						input is treated as the Cartesian product of the bundled signals. That is, the socket inputs
+						[a, b], [c], and [d, e] become the bundled signal [[a,c,d], [a,c,e], [b,c,d], [b,c,e]], where
+						[a, c, d] is then treated additively as the signal a+c+d.
+						I have yet to find a real use case for this beyond combining a bundled signal with multiple unbundled signals.
+						It is typically far more useful to have only one bundled signal per socket, possibly combined with some 
+						unbundled signals.
+					</div>
+					<div className="Blog-content">
+						Finally, note that all bundles are implictly flattened when connected to an output node (except the Console 
+						Debugger node). See the Bundle Flattener node for details.
+					</div>
+					<div className="Blog-header">Bundler Nodes</div>
+					<div className="Blog-subheader">Signal Bundler</div>
+					<div className="Blog-content">
+						This node takes in multiple signals and produces a bundle of those signals. This is one of the only nodes for which
+						multiple inputs to the same socket are <i>not</i> treated additively. For example, feeding in the constants 100 and 200
+						produces the bundle [100, 200].
+					</div>
+					<div className="Blog-content">
+						This is the only non-output node for which passing in multiple bundled signals does not take the Cartesian product. Instead, the bundles are
+						"flattened" and combined into a new bundle. For example, the inputs [[a,b],[c],[d,e]] will produce a single output bundle [a,b,c,d,e].
+					</div>
+					<div className="Blog-subheader">Bundle Flattener</div>
+					<div className="Blog-content">
+						This node takes in signals and combines them additively into a single output signal (by feeding all signals in the bundle into a 
+						gain node of gain 1). For example, the inputs [[a,b],[c],[d,e]] will produce one single-width output [a+b+c+d+e].
+					</div>
+					<div className="Blog-subheader">Bundle Debugger</div>
+					<div className="Blog-content">
+						While the Signal Bundler node comes with an information field displaying the width of the output bundle, it can often be helpful
+						to debug the width of a bundle at an intermediate step (such as after one node takes multiple bundles as input). The signal bundler node
+						shows the width of a bundle at its connected point.
+					</div>
+					<div className="Blog-header">Signal Bundling Best Practices</div>
+					<div className="Blog-content">
+						Signal bundles should be used somewhat sparingly. Due to their multiplicative nature with the Cartesian products involved, bundles can quickly
+						grow out of control to the point of crashing the browser if not used with care.<br/>However, it should be noted that multiplicative growth will
+						only occur when multiple bundles are passed into the same node.<br/> Generally, the output width of a node is equal to the product of the 
+						bundle widths of all inputs.
+					</div>
+					<div className="Blog-content">
+						Bundles should be flattened as early as possible to reduce the number of nodes created. For example, if your entire setup consists of bundled frequencies 
+						passed into an oscillator which is then passed into a gain node, you should flatten the bundle immediately after the oscillator and before the gain node.
+						This is because <i>n</i> gain nodes with one input signal each is functionally identical to one gain node with <i>n</i> input signals.
+					</div>
+					<div className="Blog-content">See the chord example
+						for a demonstration of this technique; the signal connected to the audio output is of bundle width 1, while the other signal is bundle width 20, but they
+						produce identical outputs.
+					</div>
+					<div className="Blog-header">Keyboard Note</div>
+					<div className="Blog-content">
+						The Keyboard Note node allows you to play notes from your keyboard. By default, the notes range from C4 to C6, but they can be transposed as a whole 
+						via the controls on the node. Note that the output of this node is a 25-width bundle of oscillators passed through gain nodes; therefore, the output 
+						signal is an audio signal and transposition nodes will not work properly on the output of this node (so use its built-in controls!).
+					</div>
+					<div className="Blog-content">
+						Each note's ADSR envelope's heights and interval lengths can be adjusted via the controls on the node. Amplitudes will ramp exponentially to each other
+						over time (though this sounds linear to the human ear). Note that depending on your settings, clicking artifacts may occur.
+					</div>
+					<div className="Blog-content">
+						Unless you have a specific use case in mind, it is often best to flatten the output of this node immediately.
 					</div>
 				</Layout>
 			</Layout></div>)

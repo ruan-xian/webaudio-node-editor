@@ -13,13 +13,12 @@ export class AudioOutputNode extends Classic.Node<{ signal: Classic.Socket }, {}
 
   }
 
-  data(inputs: { signal?: AudioNode[][][] }): { value: boolean } {
+  data(inputs: { signal?: AudioNode[][] }): { value: boolean } {
     let val = false
     if (inputs.signal) {
+      const signal = inputs.signal.flat()
       val = true
-      inputs.signal.forEach(itm => {
-        itm.forEach(sigList => sigList.forEach((sig => sig.connect(globalGain))))
-      });
+      signal.forEach(itm => itm.connect(globalGain))
     }
     return {
       value: val
@@ -56,16 +55,15 @@ export class UniversalOutputNode extends Classic.Node<{ signal: Classic.Socket }
     );
   }
 
-  data(inputs: { signal?: AudioNode[][][] }): { value: boolean } {
+  data(inputs: { signal?: AudioNode[][] }): { value: boolean } {
     const gain = audioCtx.createGain()
     gain.gain.value = this.controls.gain.value
 
     let val = false
     if (inputs.signal) {
+      const signal = inputs.signal.flat()
       val = true
-      inputs.signal.forEach(itm => {
-        itm.forEach(sigList => sigList.forEach((sig => sig.connect(gain))))
-      });
+      signal.forEach(itm => itm.connect(gain))
     }
     gain.connect(globalGain)
     gain.connect(this.timeAnalyserNode)

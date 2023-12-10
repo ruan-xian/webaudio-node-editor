@@ -74,7 +74,7 @@ export default function Blog() {
 						the <Link to="/documentation" className="Blog-link">documentation</Link> for 
 						how this works!) Bundling turned out
 						to add a great deal of complexity to the project, since inputs turned from single-dimensional
-						arrays into three-dimensional arrays, and Cartesian products got involved down the line, but
+						arrays into two-dimensional arrays, and Cartesian products got involved down the line, but
 						they added a lot of capacity for compactness in the node graph, and I'm happy with
 						how it turned out.
 					</div>

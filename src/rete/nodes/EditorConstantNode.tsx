@@ -14,7 +14,7 @@ export class EditorConstantNode extends Classic.Node<{}, { value: Classic.Socket
 		);
 	}
 
-	data(): { value: AudioNode[][] } {
+	data(): { value: AudioNode[] } {
 		const constantNode = audioCtx.createConstantSource();
 		const val = this.controls.value.value || 1;
 		constantNode.offset.setValueAtTime(val, audioCtx.currentTime);
@@ -23,7 +23,7 @@ export class EditorConstantNode extends Classic.Node<{}, { value: Classic.Socket
 		audioSourceStates.push(false);
 
 		return {
-			value: [[constantNode]]
+			value: [constantNode]
 		}
 	}
 

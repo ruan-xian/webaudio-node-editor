@@ -10,7 +10,7 @@ export class ConsoleDebuggerNode extends Classic.Node<{ signal: Classic.Socket }
 		this.addInput('signal', new Classic.Input(socket, 'Signal', true));
 	}
 
-	data(inputs: { signal?: AudioNode[][][] }): { value: boolean } {
+	data(inputs: { signal?: AudioNode[][] }): { value: boolean } {
 		if (inputs) {
 			console.log(inputs)
 		}

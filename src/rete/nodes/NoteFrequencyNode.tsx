@@ -34,7 +34,7 @@ export class NoteFrequencyNode extends Classic.Node<{}, { value: Classic.Socket 
 		);
 	}
 
-	data(): { value: AudioNode[][] } {
+	data(): { value: AudioNode[] } {
 		const constantNode = audioCtx.createConstantSource();
 		const noteVal = Number(this.controls.note.value)
 		const octave = this.controls.octave.value || 0
@@ -46,7 +46,7 @@ export class NoteFrequencyNode extends Classic.Node<{}, { value: Classic.Socket 
 		audioSourceStates.push(false);
 
 		return {
-			value: [[constantNode]]
+			value: [constantNode]
 		}
 	}
 
@@ -76,7 +76,7 @@ export class TransposeNode extends Classic.Node<{ signal: Classic.Socket }, { si
 		);
 	}
 
-	data(inputs: { signal?: AudioNode[][][]}): { signal: AudioNode[][] } {
+	data(inputs: { signal?: AudioNode[][]}): { signal: AudioNode[] } {
 		const signal = processBundledSignal(inputs.signal);
 		const halfstep = this.controls.halfstep.value || 0;
 		const octave = this.controls.octave.value || 0;
@@ -92,7 +92,7 @@ export class TransposeNode extends Classic.Node<{ signal: Classic.Socket }, { si
 		}
 
 		return {
-			signal: [outputs]
+			signal: outputs
 		}
 	}
 

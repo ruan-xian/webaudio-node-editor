@@ -18,7 +18,7 @@ export class ClipNode extends Classic.Node<{ signal: Classic.Socket }, { signal:
 		this.addOutput("signal", new Classic.Output(socket, "Signal"))
 	}
 
-	data(inputs: { signal?: AudioNode[][][] }): { signal: AudioNode[][] } {
+	data(inputs: { signal?: AudioNode[][] }): { signal: AudioNode[] } {
 		const amp = this.controls.amp.value || 1;
 		const outputNodes: AudioNode[] = []
 
@@ -38,7 +38,7 @@ export class ClipNode extends Classic.Node<{ signal: Classic.Socket }, { signal:
 		}
 
 		return {
-			signal: [outputNodes]
+			signal: outputNodes
 		}
 	}
 
