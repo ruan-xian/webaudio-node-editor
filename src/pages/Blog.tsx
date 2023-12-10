@@ -95,7 +95,7 @@ export default function Blog() {
 					<div className="Blog-content">
 						- I haven't figured out how to get AudioWorkletNodes to play
 						nice with React yet, but I hope I can get this soon (if I get this, then
-						I could implement things like Karplus-Strong!)
+						I could implement things like Karplus-Strong, and socketable transposition nodes!)
 					</div>
 					<div className="Blog-content">
 						- Errors can force you to have to refresh before the app works again
