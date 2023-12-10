@@ -11,6 +11,7 @@ import { NoteFrequencyNode, TransposeNode } from "./nodes/NoteFrequencyNode";
 import { SignalBundlerNode, SignalFlattenerNode, BundleDebuggerNode } from "./nodes/SignalBundlerNode";
 import { ConsoleDebuggerNode } from "./nodes/ConsoleDebuggerNode";
 import { KeyboardNoteNode } from "./nodes/KeyboardOscillatorNode";
+import { EditorDelayNode } from "./nodes/EditorDelayNode";
 
 export async function createNode(
   { editor, area, dataflow, process }: Context,
@@ -30,6 +31,8 @@ export async function createNode(
 			return new EditorConstantNode(process, data);
 		case "Gain":
 			return new EditorGainNode(process, data);
+    case "Delay":
+      return new EditorDelayNode(process, data);
 		case "Noise":
 			return new EditorNoiseNode(process, data);
 		case "Oscillator":

@@ -39,7 +39,7 @@ import { EditorBiquadNode } from './nodes/EditorBiquadNode';
 import { ClipNode } from './nodes/ClipNode';
 import { NoteFrequencyNode, TransposeNode } from './nodes/NoteFrequencyNode';
 
-import { BundlerNodeStyle, InputNodeStyle, ModifierNodeStyle, OutputNodeStyle, SourceNodeStyle } from './styles/nodestyles';
+import { BundlerNodeStyle, InputNodeStyle, ProcessorNodeStyle, OutputNodeStyle, SourceNodeStyle } from './styles/nodestyles';
 import { DashedConnection } from './styles/connectionstyles';
 import { SmoothZoom } from './smoothzoom';
 
@@ -57,6 +57,7 @@ import { CustomContextMenu } from './styles/contextstyles';
 import { BundleDebuggerNode, SignalBundlerNode, SignalFlattenerNode } from './nodes/SignalBundlerNode';
 import { ConsoleDebuggerNode } from './nodes/ConsoleDebuggerNode';
 import { KeyboardNoteNode, initKeyboard, initKeyboardHandlers } from './nodes/KeyboardOscillatorNode';
+import { EditorDelayNode } from './nodes/EditorDelayNode';
 
 const examples: { [key in string]: any } = {
   "Default": { json: defaultExample, concepts: "Drag from socket to socket to create connections; right click for context menu. Try loading some examples to the left of this!" },
@@ -75,13 +76,14 @@ type SourceNode =
 
 const sourceNodeTypes = [EditorConstantNode, EditorOscillatorNode, EditorNoiseNode, NoteFrequencyNode]
 
-type ModifierNode =
+type ProcessorNode =
   | EditorGainNode
   | EditorBiquadNode
   | ClipNode
   | TransposeNode
+  | EditorDelayNode
 
-const modifierNodeTypes = [EditorGainNode, EditorBiquadNode, ClipNode, TransposeNode]
+const processorNodeTypes = [EditorGainNode, EditorBiquadNode, ClipNode, TransposeNode, EditorDelayNode]
 
 type InputNode =
   | KeyboardNoteNode
@@ -106,7 +108,7 @@ const bundlerNodeTypes = [SignalBundlerNode, SignalFlattenerNode, BundleDebugger
 
 type Node =
   | SourceNode
-  | ModifierNode
+  | ProcessorNode
   | InputNode
   | OutputNode
   | BundlerNode;
@@ -212,6 +214,7 @@ export async function createEditor(container: HTMLElement) {
       ["Processors", [
         ["Gain", () => new EditorGainNode(process)],
         ["Biquad Filter", () => new EditorBiquadNode(process)],
+        ["Delay", () => new EditorDelayNode(process)],
         ["Clip", () => new ClipNode(process)]]],
       ["Notes",
         [["Keyboard Oscillator", () => new KeyboardNoteNode(process)],
@@ -284,8 +287,8 @@ export async function createEditor(container: HTMLElement) {
         if (sourceNodeTypes.some((c) => context.payload instanceof c)) {
           return SourceNodeStyle;
         }
-        if (modifierNodeTypes.some((c) => context.payload instanceof c)) {
-          return ModifierNodeStyle;
+        if (processorNodeTypes.some((c) => context.payload instanceof c)) {
+          return ProcessorNodeStyle;
         }
         if (bundlerNodeTypes.some((c) => context.payload instanceof c)) {
           return BundlerNodeStyle;

@@ -19,7 +19,7 @@ const SourceStyle = css<{ selected?: boolean }>`
   border-color: #ffffff88;
 `;
 
-const ModifierStyle = css<{ selected?: boolean }>`
+const ProcessorStyle = css<{ selected?: boolean }>`
   background: #00000044;
   border: none;
   border-color: white;
@@ -43,9 +43,9 @@ export function SourceNodeStyle(props: any) {
 // eslint-disable-next-line
   return <Presets.classic.Node styles={() => SourceStyle} {...props} />;
 }
-export function ModifierNodeStyle(props: any) {
+export function ProcessorNodeStyle(props: any) {
 // eslint-disable-next-line
-  return <Presets.classic.Node styles={() => ModifierStyle} {...props} />;
+  return <Presets.classic.Node styles={() => ProcessorStyle} {...props} />;
 }
 export function BundlerNodeStyle(props: any) {
   // eslint-disable-next-line

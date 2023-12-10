@@ -25,6 +25,9 @@ export default function Blog() {
 						node editors for Blender and other software, I wanted to
 						take a stab at making my own node editor for WebAudio, since I found that I really missed having something
 						like this while working on the homework for this class.</div>
+					<div className="Blog-content">
+						Note: this has only been fully tested in Google Chrome. I know some things don't work in Firefox, and I'm not sure about other browsers.
+					</div>
 					<div className="Blog-header">Implementation</div>
 					<div className="Blog-content">
 						The nice thing about this project is that WebAudio already naturally lends itself to a node-based
@@ -70,8 +73,8 @@ export default function Blog() {
 					</div>
 					<div className="Blog-content">
 						In short, a bundled signal allows many more nodes to be created from a single series of
-						connections than usual. (See 
-						the <Link to="/documentation" className="Blog-link">documentation</Link> for 
+						connections than usual. (See
+						the <Link to="/documentation" className="Blog-link">documentation</Link> for
 						how this works!) Bundling turned out
 						to add a great deal of complexity to the project, since inputs turned from single-dimensional
 						arrays into two-dimensional arrays, and Cartesian products got involved down the line, but

@@ -80,6 +80,12 @@ export default function Documentation() {
 						The transpose node <i>will not</i> work properly on audio signals - it will scale
 						the amplitude of the signal, not the frequency.
 					</div>
+					<div className="Blog-subheader">Delay</div>
+					<div className="Blog-content">
+						This node simply delays the output. This isn't really useful unless you're using it along
+						with keyboard input. Note that the "max delay" parameter must be set at least higher than
+						the maximum possible delay in your graph - this is for memory allocation reasons.
+					</div>
 					<div className="Blog-subheader">Console Debugger</div>
 					<div className="Blog-content">
 						This node outputs the input to your browser's console. Use this to get an extra fine
