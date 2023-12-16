@@ -17,6 +17,8 @@ export default function Blog() {
 					<div style={{ flexGrow: 1 }} />
 				</Flex>
 				<Layout style={{ display: 'flex', width: '75%', overflow: "auto", margin: 'auto', backgroundColor: 'rgba(0,0,0,0.2)', padding: '0em 2em' }}>
+					<div className="Blog-subheader">
+						<a className="Blog-link" href="https://youtu.be/TkXoJeamk2c" target="_blank" rel="noreferrer">Video Demo</a></div>
 					<div className="Blog-header">What is this?</div>
 					<div className="Blog-content">This is a node-based editor for WebAudio
 						created using <a className="Blog-link" href="https://retejs.org/" target="_blank" rel="noreferrer">Rete.js</a>,
