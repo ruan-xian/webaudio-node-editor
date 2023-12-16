@@ -188,6 +188,20 @@ export default function Documentation() {
 					<div className="Blog-content">
 						Unless you have a specific use case in mind, it is often best to flatten the output of this node immediately.
 					</div>
+					<div className="Blog-header">Keyboard Gain</div>
+					<div className="Blog-content">
+						This is like the Keyboard Note node but with one individual ADSR envelope separated out. In theory, it is possible to create the Keyboard Note node by combining
+						oscillators and these nodes; building the keyboard "from fundamentals" in this way is theoretically more flexible. This node lets you basically attach an ADSR
+						envelope to anything, not just the preset notes of the Keyboard Note node.
+					</div>
+					<div className="Blog-content">
+						One example of this is the Keyboard Controlled Jet example. The constant controlling everything (representing the speed of the engine) is now linked to a
+						Keyboard Gain node, letting the keypress dictate a transition from low to high speed.
+					</div>
+					<div className="Blog-content">
+						Another example is in the Gated Lo-fi Synth example. Now, pressing A affects the mix between the lowpassed and nonfiltered signal, through the use
+						of a Keyboard Gain node.
+					</div>
 				</Layout>
 			</Layout></div>)
 }

@@ -13,7 +13,7 @@ export function initKeyboardHandlers() {
 
 function keyDown(event: KeyboardEvent) {
 	const key = event.code;
-	if (keyboardFrequencyMap[key] && !keyHoldStates[key]) {
+	if (keyboardGainNodes[key] && !keyHoldStates[key]) {
 		playNote(key);
 		keyHoldStates[key] = true;
 	} else if (event.shiftKey) {
@@ -23,7 +23,7 @@ function keyDown(event: KeyboardEvent) {
 
 function keyUp(event: KeyboardEvent) {
 	const key = event.code;
-	if (keyboardFrequencyMap[key] && keyHoldStates[key]) {
+	if (keyboardGainNodes[key] && keyHoldStates[key]) {
 		if (!sustaining) {
 			releaseNote(key);
 		}
@@ -32,7 +32,7 @@ function keyUp(event: KeyboardEvent) {
 	} else if (!event.shiftKey) {
 		sustaining = false;
 
-		for (var k in keyboardFrequencyMap) {
+		for (var k in keyHoldStates) {
 			if (!keyHoldStates[k]) {
 				releaseNote(k);
 			}
@@ -64,8 +64,8 @@ function playNote(key: string) {
 		gainNode.gain.exponentialRampToValueAtTime(EPSILON, audioCtx.currentTime + runningTime);
 	}
 
-	for (var i = 0; i < keyboardGainNodes[key].length && i < keyboardADSRProfiles.length; i++) {
-		applyADSR(keyboardGainNodes[key][i], keyboardADSRProfiles[i]);
+	for (var i = 0; i < keyboardGainNodes[key].length; i++) {
+		applyADSR(keyboardGainNodes[key][i].gain, keyboardADSRProfiles[keyboardGainNodes[key][i].profile]);
 	}
 }
 
@@ -81,25 +81,25 @@ function releaseNote(key: string) {
 		gainNode.gain.setValueAtTime(0, audioCtx.currentTime + profile.releaseLength);
 	}
 
-	for (var i = 0; i < keyboardGainNodes[key].length && i < keyboardADSRProfiles.length; i++) {
-		applyADSR(keyboardGainNodes[key][i], keyboardADSRProfiles[i]);
+	for (var i = 0; i < keyboardGainNodes[key].length; i++) {
+		applyADSR(keyboardGainNodes[key][i].gain, keyboardADSRProfiles[keyboardGainNodes[key][i].profile]);
 	}
 }
 
 export function initKeyboard() {
-	for (const k in keyboardFrequencyMap) {
-		if (keyboardGainNodes[k]) {
-			keyboardGainNodes[k].length = 0
+	for (const k of keyCodeMap) {
+		if (keyboardGainNodes[k.value]) {
+			keyboardGainNodes[k.value].length = 0
 		} else {
-			keyboardGainNodes[k] = []
+			keyboardGainNodes[k.value] = []
 		}
-		keyHoldStates[k] = false
+		keyHoldStates[k.value] = false
 		sustaining = false
 	}
 	keyboardADSRProfiles.length = 0
 }
 
-const keyboardGainNodes: { [Key: string]: GainNode[] } = {}
+const keyboardGainNodes: { [Key: string]: {gain: GainNode, profile: number}[] } = {}
 const keyboardADSRProfiles: ADSR_Profile[] = []
 const keyHoldStates: { [Key: string]: boolean } = {}
 var sustaining = false
@@ -178,7 +178,10 @@ export class KeyboardNoteNode extends Classic.Node<{additionalFrequency: Classic
 		for (const k in keyboardFrequencyMap) {
 			for (const f of frequency) {
 				const gNode = getCompositeNode(keyboardFrequencyMap[k], f)
-				keyboardGainNodes[k].push(gNode)
+				keyboardGainNodes[k].push({
+					gain: gNode,
+					profile: keyboardADSRProfiles.length
+				})
 				outputs.push(gNode)
 			}
 		}
@@ -203,6 +206,92 @@ export class KeyboardNoteNode extends Classic.Node<{additionalFrequency: Classic
 			octave: this.controls.octave.value,
 			halfstep: this.controls.halfstep.value,
 			waveform: this.controls.waveform.value,
+			adsrProfile: {
+				attack: this.controls.attack.value,
+				attackLength: this.controls.attackLength.value,
+				decay: this.controls.decay.value,
+				decayLength: this.controls.decayLength.value,
+				sustain: this.controls.sustain.value,
+				sustainLength: this.controls.sustainLength.value,
+				releaseLength: this.controls.releaseLength.value,
+			}
+		}
+	}
+}
+
+
+export class KeyboardGainNode extends Classic.Node<{signal: Classic.Socket},
+	{ signal: Classic.Socket },
+	{
+		keyName: DropdownControl,
+		attack: LabeledInputControl,
+		attackLength: LabeledInputControl,
+		decay: LabeledInputControl,
+		decayLength: LabeledInputControl,
+		sustain: LabeledInputControl,
+		sustainLength: LabeledInputControl,
+		releaseLength: LabeledInputControl
+	}> {
+	width = 180
+	height = 600
+	constructor(change: () => void, initial?: { keyCode: string, adsrProfile: ADSR_Profile }) {
+		super('Keyboard Gain');
+
+		this.addInput("signal", new Classic.Input(socket, "Signal"))
+
+		this.addOutput("signal", new Classic.Output(socket, "Signal"))
+
+		this.addControl("keyName", new DropdownControl(change, keyCodeMap, initial ? initial.keyCode : "KeyA"))
+		
+		this.addControl("attack", new LabeledInputControl(initial ? initial.adsrProfile.attack : 0.8, "Attack Amplitude", change))
+		this.addControl("attackLength", new LabeledInputControl(initial ? initial.adsrProfile.attackLength : 0.05, "Attack Length", change))
+		this.addControl("decay", new LabeledInputControl(initial ? initial.adsrProfile.decay : 0.7, "Decay Amplitude", change))
+		this.addControl("decayLength", new LabeledInputControl(initial ? initial.adsrProfile.decayLength : 0.1, "Decay Length", change))
+		this.addControl("sustain", new LabeledInputControl(initial ? initial.adsrProfile.sustain : 0.1, "Sustain Amplitude", change))
+		this.addControl("sustainLength", new LabeledInputControl(initial ? initial.adsrProfile.sustainLength : 3, "Sustain Length", change))
+		this.addControl("releaseLength", new LabeledInputControl(initial ? initial.adsrProfile.releaseLength : 1, "Release Length", change))
+	}
+
+	data(inputs: {signal: AudioNode[][]}): { signal: AudioNode[] } {
+		const signal = processBundledSignal(inputs.signal)
+
+		const keyCode = this.controls.keyName.value || "KeyA";
+
+		const outputs: AudioNode[] = []
+
+		for (const s of signal) {
+			const gNode = audioCtx.createGain();
+			gNode.gain.setValueAtTime(0, audioCtx.currentTime);
+
+			s.forEach(itm => itm.connect(gNode));
+
+			keyboardGainNodes[keyCode].push({
+				gain: gNode,
+				profile: keyboardADSRProfiles.length
+			})
+
+			outputs.push(gNode)
+		}
+
+		keyboardADSRProfiles.push(
+			{
+				attack: this.controls.attack.value,
+				attackLength: this.controls.attackLength.value,
+				decay: this.controls.decay.value,
+				decayLength: this.controls.decayLength.value,
+				sustain: this.controls.sustain.value,
+				sustainLength: this.controls.sustainLength.value,
+				releaseLength: this.controls.releaseLength.value,
+			}
+		)
+		return {
+			signal: outputs
+		}
+	}
+
+	serialize() {
+		return {
+			keyCode: this.controls.keyName.value,
 			adsrProfile: {
 				attack: this.controls.attack.value,
 				attackLength: this.controls.attackLength.value,
@@ -243,3 +332,42 @@ const keyboardFrequencyMap: { [Key: string]: number } = {
 	KeyU: 987.766602512248223, //U - B
 	KeyI: 1046.5022612, //I - C
 };
+
+const keyCodeMap = [
+	{ value: "KeyA", label: "A" },
+	{ value: "KeyB", label: "B" },
+	{ value: "KeyC", label: "C" },
+	{ value: "KeyD", label: "D" },
+	{ value: "KeyE", label: "E" },
+	{ value: "KeyF", label: "F" },
+	{ value: "KeyG", label: "G" },
+	{ value: "KeyH", label: "H" },
+	{ value: "KeyI", label: "I" },
+	{ value: "KeyJ", label: "J" },
+	{ value: "KeyK", label: "K" },
+	{ value: "KeyL", label: "L" },
+	{ value: "KeyM", label: "M" },
+	{ value: "KeyN", label: "N" },
+	{ value: "KeyO", label: "O" },
+	{ value: "KeyP", label: "P" },
+	{ value: "KeyQ", label: "Q" },
+	{ value: "KeyR", label: "R" },
+	{ value: "KeyS", label: "S" },
+	{ value: "KeyT", label: "T" },
+	{ value: "KeyU", label: "U" },
+	{ value: "KeyV", label: "V" },
+	{ value: "KeyW", label: "W" },
+	{ value: "KeyX", label: "X" },
+	{ value: "KeyY", label: "Y" },
+	{ value: "KeyZ", label: "Z" },
+	{ value: "Digit1", label: "1" },
+	{ value: "Digit2", label: "2" },
+	{ value: "Digit3", label: "3" },
+	{ value: "Digit4", label: "4" },
+	{ value: "Digit5", label: "5" },
+	{ value: "Digit6", label: "6" },
+	{ value: "Digit7", label: "7" },
+	{ value: "Digit8", label: "8" },
+	{ value: "Digit9", label: "9" },
+	{ value: "Digit0", label: "0" },
+]

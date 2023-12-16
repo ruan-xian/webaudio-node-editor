@@ -101,6 +101,9 @@ export default function Blog() {
 						I could implement things like Karplus-Strong, and socketable transposition nodes!)
 					</div>
 					<div className="Blog-content">
+						- Cycles are not allowed by Rete
+					</div>
+					<div className="Blog-content">
 						- Errors can force you to have to refresh before the app works again
 					</div>
 					<div className="Blog-content">

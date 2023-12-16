@@ -51,12 +51,15 @@ import defaultExample from './examples/default.json'
 import brookExample from './examples/brook.json';
 import amfmExample from './examples/amfm.json'
 import jetEngineExample from './examples/jetengine.json'
+import keyboardJetEngineExample from './examples/keyboardcontrolledjet.json'
 import chordExample from './examples/chord.json'
 import lofiSynthExample from './examples/lofisynth.json'
+import gatedLofiExample from './examples/gatedlofisynth.json'
+
 import { CustomContextMenu } from './styles/contextstyles';
 import { BundleDebuggerNode, SignalBundlerNode, SignalFlattenerNode } from './nodes/SignalBundlerNode';
 import { ConsoleDebuggerNode } from './nodes/ConsoleDebuggerNode';
-import { KeyboardNoteNode, initKeyboard, initKeyboardHandlers } from './nodes/KeyboardOscillatorNode';
+import { KeyboardGainNode, KeyboardNoteNode, initKeyboard, initKeyboardHandlers } from './nodes/KeyboardOscillatorNode';
 import { EditorDelayNode } from './nodes/EditorDelayNode';
 
 const examples: { [key in string]: any } = {
@@ -64,8 +67,10 @@ const examples: { [key in string]: any } = {
   "Babbling Brook (HW3)": { json: brookExample, concepts: "Filters, noise, signal addition" },
   "AM+FM Synthesis": { json: amfmExample, concepts: "Synthesis, addition to base values" },
   "Jet Engine": { json: jetEngineExample, concepts: "Multiparameter control with one constant node, intermediate debugging with visualizer outputs" },
+  "Keyboard Controlled Jet": { json: keyboardJetEngineExample, concepts: "Try pressing A! Uses a keyboard gain node to control the speed of the engine" },
   "Chord": { json: chordExample, concepts: "Signal bundling, note frequency node, transpose node" },
-  "Lo-fi Synth": { json: lofiSynthExample, concepts: "Try pressing keyboard keys. Shift key acts as a sustain pedal." }
+  "Lo-fi Synth": { json: lofiSynthExample, concepts: "Try pressing keyboard keys. Shift key acts as a sustain pedal." },
+  "Gated Lo-fi Synth": { json: gatedLofiExample, concepts: "Hold A to shift the mix between filtered and unfiltered notes." }
 }
 
 type SourceNode =
@@ -87,8 +92,9 @@ const processorNodeTypes = [EditorGainNode, EditorBiquadNode, ClipNode, Transpos
 
 type InputNode =
   | KeyboardNoteNode
+  | KeyboardGainNode
 
-const inputNodeTypes = [KeyboardNoteNode]
+const inputNodeTypes = [KeyboardNoteNode, KeyboardGainNode]
 
 type OutputNode =
   | UniversalOutputNode
@@ -168,6 +174,7 @@ function killOscillators() {
 }
 
 var processQueued = false
+var reprocessQueued = false
 
 export async function createEditor(container: HTMLElement) {
 
@@ -176,7 +183,10 @@ export async function createEditor(container: HTMLElement) {
   const engine = new DataflowEngine<Schemes>();
 
   function process() {
-    if (processQueued) return;
+    if (processQueued) {
+      reprocessQueued = true;
+      return;
+    }
     processQueued = true;
     engine.reset();
 
@@ -189,7 +199,13 @@ export async function createEditor(container: HTMLElement) {
         .filter((n) => outputNodeTypes.some(itm => n instanceof itm) || bundlerNodeTypes.some(itm => n instanceof itm))
         .forEach((n) => engine.fetch(n.id));
       setTimeout(reInitOscillators, 100);
-      setTimeout(() => processQueued = false, 150);
+      setTimeout(() => {
+        processQueued = false
+        if (reprocessQueued) {
+          reprocessQueued = false
+          process()
+        }
+      }, 150);
     }, 50)
   }
 
@@ -217,9 +233,11 @@ export async function createEditor(container: HTMLElement) {
         ["Delay", () => new EditorDelayNode(process)],
         ["Clip", () => new ClipNode(process)]]],
       ["Notes",
-        [["Keyboard Oscillator", () => new KeyboardNoteNode(process)],
-        ["Note Frequency", () => new NoteFrequencyNode(process)],
+        [["Note Frequency", () => new NoteFrequencyNode(process)],
         ["Transpose", () => new TransposeNode(process)]]],
+      ["Keyboard Input",
+        [["Keyboard Oscillator", () => new KeyboardNoteNode(process)],
+        ["Keyboard Gain", () => new KeyboardGainNode(process)]]],
       ["Outputs",
         [["Universal Output", () => new UniversalOutputNode(process)],
         ["Audio Output", () => new AudioOutputNode(process)],
