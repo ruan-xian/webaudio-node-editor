@@ -59,7 +59,7 @@ import gatedLofiExample from './examples/gatedlofisynth.json'
 import { CustomContextMenu } from './styles/contextstyles';
 import { BundleDebuggerNode, SignalBundlerNode, SignalFlattenerNode } from './nodes/SignalBundlerNode';
 import { ConsoleDebuggerNode } from './nodes/ConsoleDebuggerNode';
-import { KeyboardGainNode, KeyboardNoteNode, initKeyboard, initKeyboardHandlers } from './nodes/KeyboardOscillatorNode';
+import { KeyboardADSRNode, KeyboardNoteNode, initKeyboard, initKeyboardHandlers } from './nodes/KeyboardOscillatorNode';
 import { EditorDelayNode } from './nodes/EditorDelayNode';
 
 const examples: { [key in string]: any } = {
@@ -92,9 +92,9 @@ const processorNodeTypes = [EditorGainNode, EditorBiquadNode, ClipNode, Transpos
 
 type InputNode =
   | KeyboardNoteNode
-  | KeyboardGainNode
+  | KeyboardADSRNode
 
-const inputNodeTypes = [KeyboardNoteNode, KeyboardGainNode]
+const inputNodeTypes = [KeyboardNoteNode, KeyboardADSRNode]
 
 type OutputNode =
   | UniversalOutputNode
@@ -237,7 +237,7 @@ export async function createEditor(container: HTMLElement) {
         ["Transpose", () => new TransposeNode(process)]]],
       ["Keyboard Input",
         [["Keyboard Oscillator", () => new KeyboardNoteNode(process)],
-        ["Keyboard Gain", () => new KeyboardGainNode(process)]]],
+        ["Keyboard ADSR", () => new KeyboardADSRNode(process)]]],
       ["Outputs",
         [["Universal Output", () => new UniversalOutputNode(process)],
         ["Audio Output", () => new AudioOutputNode(process)],

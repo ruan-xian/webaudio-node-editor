@@ -220,7 +220,7 @@ export class KeyboardNoteNode extends Classic.Node<{additionalFrequency: Classic
 }
 
 
-export class KeyboardGainNode extends Classic.Node<{signal: Classic.Socket},
+export class KeyboardADSRNode extends Classic.Node<{signal: Classic.Socket},
 	{ signal: Classic.Socket },
 	{
 		keyName: DropdownControl,
@@ -235,7 +235,7 @@ export class KeyboardGainNode extends Classic.Node<{signal: Classic.Socket},
 	width = 180
 	height = 600
 	constructor(change: () => void, initial?: { keyCode: string, adsrProfile: ADSR_Profile }) {
-		super('Keyboard Gain');
+		super('Keyboard ADSR');
 
 		this.addInput("signal", new Classic.Input(socket, "Signal"))
 

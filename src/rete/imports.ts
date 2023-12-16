@@ -10,7 +10,7 @@ import { ClipNode } from './nodes/ClipNode';
 import { NoteFrequencyNode, TransposeNode } from "./nodes/NoteFrequencyNode";
 import { SignalBundlerNode, SignalFlattenerNode, BundleDebuggerNode } from "./nodes/SignalBundlerNode";
 import { ConsoleDebuggerNode } from "./nodes/ConsoleDebuggerNode";
-import { KeyboardGainNode, KeyboardNoteNode } from "./nodes/KeyboardOscillatorNode";
+import { KeyboardADSRNode, KeyboardNoteNode } from "./nodes/KeyboardOscillatorNode";
 import { EditorDelayNode } from "./nodes/EditorDelayNode";
 
 export async function createNode(
@@ -55,8 +55,8 @@ export async function createNode(
       return new BundleDebuggerNode((c) => area.update("control", c.id));
     case "Keyboard Note":
       return new KeyboardNoteNode(process, data);
-    case "Keyboard Gain":
-      return new KeyboardGainNode(process, data);
+    case "Keyboard ADSR":
+      return new KeyboardADSRNode(process, data);
 		default:
 			throw new Error("Unsupported node");
 	}
