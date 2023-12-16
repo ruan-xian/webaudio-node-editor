@@ -14,6 +14,8 @@ export default function Blog() {
 					<Link to="/blog" className='App-header'>Blog</Link>
 					<Divider type="vertical" style={{ top: "0px", height: "20px", borderLeft: "2px solid rgba(255,255,255,0.4)" }}></Divider>
 					<Link to="/documentation" className='App-link'>Documentation</Link>
+					<Divider type="vertical" style={{ top: "0px", height: "20px", borderLeft: "2px solid rgba(255,255,255,0.4)" }}></Divider>
+					<a className='App-link' href="https://github.com/ruan-xian/webaudio-node-editor" target="_blank" rel="noreferrer">GitHub</a>
 					<div style={{ flexGrow: 1 }} />
 				</Flex>
 				<Layout style={{ display: 'flex', width: '75%', overflow: "auto", margin: 'auto', backgroundColor: 'rgba(0,0,0,0.2)', padding: '0em 2em' }}>
