@@ -48,7 +48,7 @@ import { clearEditor } from './utils';
 import { CustomSocket } from './styles/socketstyles';
 
 import defaultExample from './examples/default.json'
-import brookExample from './examples/brook.json';
+//import brookExample from './examples/brook.json';
 import amfmExample from './examples/amfm.json'
 import jetEngineExample from './examples/jetengine.json'
 import keyboardJetEngineExample from './examples/keyboardcontrolledjet.json'
@@ -64,7 +64,6 @@ import { EditorDelayNode } from './nodes/EditorDelayNode';
 
 const examples: { [key in string]: any } = {
   "Default": { json: defaultExample, concepts: "Drag from socket to socket to create connections; right click for context menu. Try loading some examples to the left of this!" },
-  "Babbling Brook (HW3)": { json: brookExample, concepts: "Filters, noise, signal addition" },
   "AM+FM Synthesis": { json: amfmExample, concepts: "Synthesis, addition to base values" },
   "Jet Engine": { json: jetEngineExample, concepts: "Multiparameter control with one constant node, intermediate debugging with visualizer outputs" },
   "Keyboard Controlled Jet": { json: keyboardJetEngineExample, concepts: "Try pressing A! Uses a keyboard gain node to control the speed of the engine" },
@@ -431,7 +430,7 @@ export async function createEditor(container: HTMLElement) {
     exportEditorToFile,
     importEditorFromFile,
     clearEditor: () => clearEditor(editor),
-    destroy: () => {killOscillators(); initKeyboard(); area.destroy()},
+    destroy: () => { killOscillators(); initKeyboard(); area.destroy() },
     getExamples() { return Object.keys(examples) },
     loadExample,
     toggleAudio,
